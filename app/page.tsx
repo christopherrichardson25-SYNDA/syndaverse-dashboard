@@ -1,6 +1,14 @@
 // app/page.tsx
+"use client";
+
 import Image from "next/image";
-import NavHeader from "../components/NavHeader"; // ← ruta relativa segura
+import { useState } from "react";
+
+// Si tu nav se llama distinto, ajusta la importación:
+import NavHeader from "../components/NavHeader";
+// Si usas NavWhite, cambia a: import NavWhite from "../components/NavWhite";
+
+import ManifestoModal from "../components/ManifestoModal";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -12,78 +20,64 @@ const REPOS = {
 };
 
 export default function Home() {
+  const [manifestoOpen, setManifestoOpen] = useState(false);
+
   return (
     <>
-     <NavHeader />
-      
-      {/* HERO: banda azul + CTA */}
+      <NavHeader />
+      {/* <NavWhite />  // usa este si tu proyecto no tiene NavHeader */}
+
+      {/* HERO: blue band + CTA (no logo dentro del hero) */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
-            {/* Copy */}
+            {/* Copy (EN) */}
             <div>
-              <Image
-                src="/synda-logo.png"
-                alt="SYNDA"
-                width={220}
-                height={64}
-                priority
-                className="h-10 w-auto md:h-12"
-              />
-              <h1 className="mt-6 text-3xl font-bold leading-tight md:text-5xl">
-                Hacemos visible lo invisible
+              <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl">
+                We make the invisible visible
               </h1>
-              <p className="mt-3 text-white/90 md:text-lg">
-                Agentes neurodivergentes + empresas, resolviendo problemas complejos
-                para elevar la <b>confianza</b> en tu industria (TRU-e).
+              <p className="mt-4 text-white/90 md:text-lg">
+                We unite <b>science</b>, <b>resonance</b>, and <b>community</b> to
+                turn <b>difference</b> into a <b>superpower</b> and transform the
+                invisible into a <b>creative force</b>.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
-                  href="mailto:contact@syndaverse.com"
+                <button
+                  type="button"
+                  onClick={() => setManifestoOpen(true)}
                   className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
                 >
-                  LET’S CHAT
-                </a>
+                  Find out more
+                </button>
                 <a
                   href={REPOS.truCalculator}
                   target="_blank"
                   rel="noopener"
                   className="inline-flex items-center rounded-full bg-white/10 px-5 py-2.5 font-semibold text-white ring-1 ring-white/30 hover:bg-white/15"
                 >
-                  Probar TRU-e calculator
+                  Try TRU-e calculator
                 </a>
               </div>
             </div>
 
-            {/* Tarjeta demo (puedes reemplazar por imagen propia) */}
+            {/* Right: replace TRU-e snapshot with bridge.png */}
             <div className="relative">
-              <div className="rounded-2xl bg-white p-5 shadow-xl ring-1 ring-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-sky-100 text-sky-700">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M12 3a9 9 0 100 18 9 9 0 000-18Zm1 14.93V13h4.93A7.002 7.002 0 0113 17.93ZM11 6.07V11H6.07A7.002 7.002 0 0111 6.07ZM6.07 13H11v4.93A7.002 7.002 0 016.07 13ZM13 11V6.07A7.002 7.002 0 0117.93 11H13Z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900">TRU-e snapshot</h3>
-                    <p className="text-sm text-slate-600">Vista rápida de confianza por industria.</p>
-                  </div>
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                  <li>• IET sector: 72 (↑ 3m)</li>
-                  <li>• Gap WTP ↔ Precio: −4%</li>
-                  <li>• Reclamos / 1k servicios: 12</li>
-                </ul>
-              </div>
-              <div className="absolute -right-3 -top-3 grid h-10 w-10 place-items-center rounded-full bg-emerald-500 text-white ring-4 ring-white/40">
-                ✓
+              <div className="rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200">
+                <Image
+                  src="/bridge.png"
+                  alt="Bridge: from the invisible to the visible"
+                  width={720}
+                  height={720}
+                  className="h-auto w-full rounded-xl"
+                  priority
+                />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ───────── The SYNDA Difference (nuevo) */}
+      {/* ───────── The SYNDA Difference */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-center text-3xl font-semibold leading-tight text-slate-900 md:text-left">
@@ -121,13 +115,13 @@ export default function Home() {
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Card
-              title="Empresas — Onboarding TRU-e"
-              desc="Nivel de Marca, IET y Gap WTP↔Precio para definir prioridades y brief."
+              title="Enterprises — TRU-e Onboarding"
+              desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
               cta={{ label: "Onboarding Enterprise", href: REPOS.onboardingEnterprise }}
             />
             <Card
-              title="Agentes — PTrust + Entrevista lateral"
-              desc="Verificación + superpoderes (De Bono). Compites por mérito, no por identidad."
+              title="Agents — PTrust + Lateral interview"
+              desc="Verification + superpowers (De Bono). Compete on merit, not identity."
               cta={{ label: "Onboarding Agents", href: REPOS.onboardingAgents }}
             />
           </div>
@@ -139,10 +133,10 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
           <div className="grid gap-4 md:grid-cols-4">
-            <Step n="1" title="Brief + Premio" desc="Publica el desafío con recompensa y plazos." />
-            <Step n="2" title="Ponderaciones AHP" desc="Cuestionario por sombreros de De Bono; define el match." />
-            <Step n="3" title="Ranking & Selección" desc="Agentes priorizados por AHP; se eligen ganadores." />
-            <Step n="4" title="Entrega & Evidencia" desc="Validación y aprendizaje para TRU-e/IET." />
+            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
+            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
+            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
+            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
@@ -151,7 +145,7 @@ export default function Home() {
               target="_blank"
               rel="noopener"
             >
-              Abrir Syndapsis
+              Open Syndapsis
             </a>
             <a
               className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
@@ -169,7 +163,9 @@ export default function Home() {
       <section id="calculator" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-2 text-xl font-semibold text-slate-900">TRU-e calculator</h2>
-          <p className="text-slate-700">Prueba el método TRU-e y obtén un resultado rápido (motivacional).</p>
+          <p className="text-slate-700">
+            Try the TRU-e method and get a quick motivational result.
+          </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
@@ -177,7 +173,7 @@ export default function Home() {
               target="_blank"
               rel="noopener"
             >
-              Abrir Calculadora TRU-e
+              Open TRU-e Calculator
             </a>
             <a
               className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-white"
@@ -185,7 +181,7 @@ export default function Home() {
               target="_blank"
               rel="noopener"
             >
-              Iniciar TRU-e
+              Start TRU-e
             </a>
           </div>
         </div>
@@ -197,19 +193,19 @@ export default function Home() {
           <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <ListCard
-              title="Valores"
+              title="Values"
               items={[
-                "Mérito y evidencia (TRU-e / PTrust)",
-                "Privacidad y respeto de la neurodiversidad",
-                "Transparencia de criterios (AHP) y resultados",
+                "Merit and evidence (TRU-e / PTrust)",
+                "Privacy and respect for neurodiversity",
+                "Transparent criteria (AHP) and outcomes",
               ]}
             />
             <ListCard
-              title="Diferencia vs empleo inclusivo tradicional"
+              title="Different from traditional inclusive hiring"
               items={[
-                "No buscamos puestos: resolvemos problemas",
-                "Match por superpoderes, no por CV",
-                "Recompensa por resultados; reputación por confianza",
+                "We don't place jobs — we solve problems",
+                "Match by superpowers, not by CV",
+                "Reward for outcomes; reputation for trust",
               ]}
             />
           </div>
@@ -220,9 +216,11 @@ export default function Home() {
       <section id="syndatools" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-2 text-xl font-semibold text-slate-900">
-            Syndatools — Apps, agentes & knowledge
+            Syndatools — Apps, agents & knowledge
           </h2>
-        <p className="text-slate-700">Marketplace para potenciar empresas y agentes. Incluye Syndabooks.</p>
+          <p className="text-slate-700">
+            Marketplace to power companies and agents. Includes Syndabooks.
+          </p>
           <div className="mt-4">
             <a
               className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
@@ -230,7 +228,7 @@ export default function Home() {
               target="_blank"
               rel="noopener"
             >
-              Abrir Syndatools
+              Open Syndatools
             </a>
           </div>
         </div>
@@ -241,15 +239,18 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-2 text-xl font-semibold text-slate-900">Privacy Policy</h2>
           <p className="text-slate-700">
-            Datos mínimos, cifrado y consentimiento explícito. Identidad de agentes protegida; se evalúa el mérito.
+            Minimal data, encryption and explicit consent. Agent identities are protected; merit is evaluated.
           </p>
         </div>
       </section>
+
+      {/* Manifesto modal */}
+      <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
     </>
   );
 }
 
-/* ───────── Subcomponentes ───────── */
+/* ───────── Subcomponents ───────── */
 
 function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
@@ -265,7 +266,7 @@ function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string;
   );
 }
 
-/* Íconos (SVG inline) */
+/* Icons */
 function MaskIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
