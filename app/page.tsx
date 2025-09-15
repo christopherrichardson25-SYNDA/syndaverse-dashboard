@@ -1,6 +1,6 @@
 // app/page.tsx
 import Image from "next/image";
-import NavWhite from "@/components/NavWhite"; // si no tienes alias "@", usa: "../components/NavWhite"
+import NavHeader from "../components/NavHeader"; // ← ruta relativa segura
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -14,8 +14,8 @@ const REPOS = {
 export default function Home() {
   return (
     <>
-      <NavWhite />
-
+     <NavHeader />
+      
       {/* HERO: banda azul + CTA */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
