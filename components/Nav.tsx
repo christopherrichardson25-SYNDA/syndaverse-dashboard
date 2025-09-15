@@ -30,7 +30,7 @@ export default function Nav() {
   );
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur bg-black/30 border-b border-white/10">
+   <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
       <nav className="container-syn h-14 flex items-center justify-between">
         <a href="#what" className="flex items-center gap-2">
           <span className="grid place-items-center w-7 h-7 rounded-md bg-gradient-to-br from-violet-600 to-cyan-500 font-extrabold">Λ</span>
