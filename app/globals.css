@@ -1,103 +1,90 @@
 @import "tailwindcss";
 
-/* ── Tokens base */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  /* extras claro */
-  --muted: #6b7280;
-  --card: #f8fafc;
-  --border: #e5e7eb;
+/* ===== Paleta estilo Alpal ===== */
+:root{
+  /* Fondo general (navy, pero no negro) */
+  --background:#0F2B4C;         /* navy 800 */
+  --foreground:#ECF2F8;         /* texto global claro */
+
+  /* Superficies claras (para cards) */
+  --card:#F6FAFF;               /* casi blanco azulado */
+  --card-2:#E9F2FF;             /* para degradado */
+  --card-foreground:#1E293B;    /* texto dentro de cards (slate-800) */
+  --muted:#475569;              /* gris legible en card */
+  --border:#D6E3F4;             /* borde de cards */
+
+  /* Accentos */
+  --primary:#FFC72C;            /* amarillo CTA */
+  --primary-foreground:#0B2A4A; /* texto del CTA (navy) */
+  --secondary:#2D7DD2;          /* azul de apoyo (chips, hovers) */
 }
 
-/* Dark por defecto en SYNDΛverse */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0B0F19;   /* fondo cosmos */
-    --foreground: #E5E7EB;   /* texto */
-    --muted: #A1A1AA;
-    --card: #0F1526;
-    --border: #1B2440;
-  }
-}
-
-/* ── Tailwind v4 theme tokens (clases: bg-background, text-foreground, etc.) */
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
-               Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
-
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
   --color-card: var(--card);
+  --color-card-2: var(--card-2);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
   --color-border: var(--border);
-
-  /* Marca */
-  --color-primary: #7C3AED;    /* violeta */
-  --color-secondary: #06B6D4;  /* cian */
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-danger:  #EF4444;
-
-  --radius: 14px;
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas;
 }
 
-/* ── Base */
-@layer base {
-  html { scroll-behavior: smooth; }
-  body {
-    color-scheme: light dark;
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial;
+/* Base */
+@layer base{
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--background);
+    color:var(--foreground);
+    font-family:var(--font-sans);
   }
-  ::selection {
-    background: color-mix(in oklab, var(--color-primary) 65%, transparent);
-    color: white;
-  }
+  ::selection{background:color-mix(in oklab, var(--secondary) 70%, transparent); color:white;}
 }
 
-/* ── Componentes reutilizables */
-@layer components {
-  .container-syn { @apply mx-auto max-w-6xl px-4; }
-  .section      { @apply py-10; }
+/* Componentes */
+@layer components{
+  .container-syn{@apply mx-auto max-w-6xl px-4;}
+  .section{@apply py-10;}
 
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold;
+  /* CTA amarillo, texto navy, con hover sutil */
+  .btn{@apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold;}
+  .btn-primary{
+    background:var(--primary);
+    color:var(--primary-foreground);
+    box-shadow:0 8px 20px rgba(255,199,44,.25);
   }
-  .btn-primary {
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-    color: white;
-  }
-  .btn-ghost {
-    @apply border border-white/20 text-foreground;
-    background: transparent;
-  }
-
-  .chip {
-    @apply inline-flex items-center rounded-full border px-3 py-1 text-sm;
-    border-color: color-mix(in oklab, var(--color-border) 85%, transparent);
-    color: color-mix(in oklab, var(--color-foreground) 70%, transparent);
+  .btn-primary:hover{filter:saturate(1.05) brightness(1.02);}
+  .btn-ghost{
+    @apply border px-4 py-2 rounded-full;
+    border-color:color-mix(in oklab, var(--border) 85%, transparent);
+    color:#F0F6FF;
+    background:rgba(255,255,255,.06);
   }
 
-  .card {
-    @apply rounded-2xl p-5 ring-1;
-    background: linear-gradient(180deg, var(--color-card), #0c1224);
-    --tw-ring-color: color-mix(in oklab, var(--color-border) 80%, transparent);
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  /* Chips del menú */
+  .chip{
+    @apply inline-flex items-center rounded-full px-3 py-1 text-sm;
+    color:#E4EEFF;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.15);
   }
+  .ring-focus{box-shadow:0 0 0 3px color-mix(in oklab, var(--secondary) 60%, transparent);}
 
-  .glass {
-    backdrop-filter: blur(6px) saturate(1.1);
-    background: color-mix(in oklab, var(--color-background) 60%, transparent);
-    border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  /* Cards claras con texto oscuro (¡clave!) */
+  .card{
+    background:linear-gradient(180deg, var(--color-card), var(--color-card-2));
+    border:1px solid var(--color-border);
+    color:var(--color-card-foreground);       /* ← texto dentro de la card en oscuro */
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 10px 26px rgba(12,33,64,.12);
   }
-}
-
-/* ── Utilities pequeñas */
-@layer utilities {
-  .ring-focus { box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-secondary) 65%, transparent); }
-  .muted      { color: var(--color-muted); }
-  .border-syn { border-color: var(--color-border); }
+  .card h3{color:#0F172A;}
+  .card p{color:var(--color-card-foreground);}
+  .card .muted{color:var(--color-muted);}
+  .glass{backdrop-filter:blur(8px) saturate(1.1); background:rgba(15,43,76,.55); border:1px solid rgba(230,240,255,.15);}
 }
