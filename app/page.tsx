@@ -1,6 +1,5 @@
 // app/page.tsx
 import Image from "next/image";
-// ⚠️ Si tu alias "@" no está configurado, cambia a: import NavWhite from "../components/NavWhite";
 import NavWhite from "@/components/NavWhite";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
@@ -84,15 +83,34 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The SYNDΛ difference */}
-      <section className="bg-white">
+      {/* ───────────────────────── The SYNDA Difference (nuevo con iconos) */}
+      <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">The SYNDΛ difference</h2>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Tile title="TRU-e (IET)" desc="Valorizamos la confianza por industria con un indicador accionable." />
-            <Tile title="Match AHP" desc="Ponderaciones por sombreros (De Bono) para alinear desafío y talento." />
-            <Tile title="Mérito & Privacidad" desc="PTrust, anonimato controlado y reputación por evidencia." />
-            <Tile title="Syndatools" desc="Apps, agentes y knowledge para acelerar soluciones." />
+          <h2 className="mb-6 text-center text-3xl font-semibold leading-tight text-slate-900 md:text-left">
+            The SYNDΛ Difference
+          </h2>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <DiffCard
+              icon={<MaskIcon />}
+              title="Anonymity First"
+              text="Protects identities → removes bias → only merit matters."
+            />
+            <DiffCard
+              icon={<TrophyIcon />}
+              title="Challenge-based Meritocracy"
+              text="Talent is measured by solving real challenges, not resumes."
+            />
+            <DiffCard
+              icon={<PuzzleIcon />}
+              title="Collective Intelligence"
+              text="A “super-brain” of diverse minds achieving the impossible."
+            />
+            <DiffCard
+              icon={<RocketIcon />}
+              title="Impact Innovation"
+              text="Transforms the invisible into visible results for business and society."
+            />
           </div>
         </div>
       </section>
@@ -177,6 +195,8 @@ export default function Home() {
       <section id="who" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
+        </div>
+        <div className="container mx-auto max-w-6xl px-4 pb-12">
           <div className="grid gap-4 md:grid-cols-2">
             <ListCard
               title="Valores"
@@ -232,6 +252,20 @@ export default function Home() {
 }
 
 /* ───────── Subcomponentes ───────── */
+
+function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-col items-center text-center md:items-start md:text-left">
+        <div className="mb-4 grid h-16 w-16 place-items-center rounded-xl bg-sky-50 text-sky-700">
+          {icon}
+        </div>
+        <h3 className="text-2xl font-semibold text-slate-900">{title}</h3>
+        <p className="mt-2 text-[15px] leading-relaxed text-slate-600">{text}</p>
+      </div>
+    </div>
+  );
+}
 
 function Tile({ title, desc }: { title: string; desc: string }) {
   return (
@@ -291,5 +325,36 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+/* ====== Íconos (SVG inline) ====== */
+function MaskIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 5c4.5 0 8 1.2 8 3.5 0 3.9-3.6 7.3-8 9.5-4.4-2.2-8-5.6-8-9.5C4 6.2 7.5 5 12 5Zm-4.8 4a2.2 2.2 0 1 0 0 4.4A2.2 2.2 0 0 0 7.2 9Zm9.6 0a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/>
+    </svg>
+  );
+}
+function TrophyIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M6 3h12v2h2a2 2 0 0 1-2 2h-1.1A6.9 6.9 0 0 1 13 12.9V15h3v2H8v-2h3v-2.1A6.9 6.9 0 0 1 7.1 7H6A2 2 0 0 1 4 5h2V3Zm12 2V4H6v1h1.1a5 5 0 1 0 9.8 0H18Z"/>
+    </svg>
+  );
+}
+function PuzzleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M13 3a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v2h-1a2 2 0 1 0 0 4h1v2a2 2 0 0 1-2 2h-2v-1a2 2 0 1 0-4 0v1H8a2 2 0 0 1-2-2v-2h1a2 2 0 1 0 0-4H6V8a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2Z"/>
+    </svg>
+  );
+}
+function RocketIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M14 3a7 7 0 0 1 7 7c0 3-2.3 5.9-4.6 8.2a1 1 0 0 1-.7.3H14l-2 2-1.2-3.2L7.6 16 10 14v-1.7a1 1 0 0 1 .3-.7C8 9.3 9 3 14 3Zm-1.5 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z"/>
+      <path d="M6 19c.7-.7 1.8-1 2.6-.2.8.8.5 1.9-.2 2.6-1 .9-2.9 1.3-3.4.8-.5-.5-.1-2.4.9-3.2Z" fill="#F59E0B"/>
+    </svg>
   );
 }
