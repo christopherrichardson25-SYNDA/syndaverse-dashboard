@@ -1,6 +1,6 @@
 // app/page.tsx
 import Image from "next/image";
-import NavWhite from "@/components/NavWhite";
+import NavWhite from "@/components/NavWhite"; // si no tienes alias "@", usa: "../components/NavWhite"
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -34,8 +34,8 @@ export default function Home() {
                 Hacemos visible lo invisible
               </h1>
               <p className="mt-3 text-white/90 md:text-lg">
-                Agentes neurodivergentes + empresas, resolviendo problemas
-                complejos para elevar la <b>confianza</b> en tu industria (TRU-e).
+                Agentes neurodivergentes + empresas, resolviendo problemas complejos
+                para elevar la <b>confianza</b> en tu industria (TRU-e).
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
@@ -83,11 +83,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────────────────────── The SYNDA Difference (nuevo con iconos) */}
+      {/* ───────── The SYNDA Difference (nuevo) */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-center text-3xl font-semibold leading-tight text-slate-900 md:text-left">
-            The SYNDΛ Difference
+            The SYNDA Difference
           </h2>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -195,8 +195,6 @@ export default function Home() {
       <section id="who" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
-        </div>
-        <div className="container mx-auto max-w-6xl px-4 pb-12">
           <div className="grid gap-4 md:grid-cols-2">
             <ListCard
               title="Valores"
@@ -224,7 +222,7 @@ export default function Home() {
           <h2 className="mb-2 text-xl font-semibold text-slate-900">
             Syndatools — Apps, agentes & knowledge
           </h2>
-          <p className="text-slate-700">Marketplace para potenciar empresas y agentes. Incluye Syndabooks.</p>
+        <p className="text-slate-700">Marketplace para potenciar empresas y agentes. Incluye Syndabooks.</p>
           <div className="mt-4">
             <a
               className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
@@ -238,7 +236,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Privacy + chat */}
+      {/* Privacy */}
       <section id="privacy" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-2 text-xl font-semibold text-slate-900">Privacy Policy</h2>
@@ -267,12 +265,34 @@ function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string;
   );
 }
 
-function Tile({ title, desc }: { title: string; desc: string }) {
+/* Íconos (SVG inline) */
+function MaskIcon() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-slate-700">{desc}</p>
-    </div>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 5c4.5 0 8 1.2 8 3.5 0 3.9-3.6 7.3-8 9.5-4.4-2.2-8-5.6-8-9.5C4 6.2 7.5 5 12 5Zm-4.8 4a2.2 2.2 0 1 0 0 4.4A2.2 2.2 0 0 0 7.2 9Zm9.6 0a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/>
+    </svg>
+  );
+}
+function TrophyIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M6 3h12v2h2a2 2 0 0 1-2 2h-1.1A6.9 6.9 0 0 1 13 12.9V15h3v2H8v-2h3v-2.1A6.9 6.9 0 0 1 7.1 7H6A2 2 0 0 1 4 5h2V3Zm12 2V4H6v1h1.1a5 5 0 1 0 9.8 0H18Z"/>
+    </svg>
+  );
+}
+function PuzzleIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M13 3a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v2h-1a2 2 0 1 0 0 4h1v2a2 2 0 0 1-2 2h-2v-1a2 2 0 1 0-4 0v1H8a2 2 0 0 1-2-2v-2h1a2 2 0 1 0 0-4H6V8a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2Z"/>
+    </svg>
+  );
+}
+function RocketIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M14 3a7 7 0 0 1 7 7c0 3-2.3 5.9-4.6 8.2a1 1 0 0 1-.7.3H14l-2 2-1.2-3.2L7.6 16 10 14v-1.7a1 1 0 0 1 .3-.7C8 9.3 9 3 14 3Zm-1.5 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z"/>
+      <path d="M6 19c.7-.7 1.8-1 2.6-.2.8.8.5 1.9-.2 2.6-1 .9-2.9 1.3-3.4.8-.5-.5-.1-2.4.9-3.2Z" fill="#F59E0B"/>
+    </svg>
   );
 }
 
@@ -325,36 +345,5 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
         ))}
       </ul>
     </div>
-  );
-}
-
-/* ====== Íconos (SVG inline) ====== */
-function MaskIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 5c4.5 0 8 1.2 8 3.5 0 3.9-3.6 7.3-8 9.5-4.4-2.2-8-5.6-8-9.5C4 6.2 7.5 5 12 5Zm-4.8 4a2.2 2.2 0 1 0 0 4.4A2.2 2.2 0 0 0 7.2 9Zm9.6 0a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/>
-    </svg>
-  );
-}
-function TrophyIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M6 3h12v2h2a2 2 0 0 1-2 2h-1.1A6.9 6.9 0 0 1 13 12.9V15h3v2H8v-2h3v-2.1A6.9 6.9 0 0 1 7.1 7H6A2 2 0 0 1 4 5h2V3Zm12 2V4H6v1h1.1a5 5 0 1 0 9.8 0H18Z"/>
-    </svg>
-  );
-}
-function PuzzleIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M13 3a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v2h-1a2 2 0 1 0 0 4h1v2a2 2 0 0 1-2 2h-2v-1a2 2 0 1 0-4 0v1H8a2 2 0 0 1-2-2v-2h1a2 2 0 1 0 0-4H6V8a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2Z"/>
-    </svg>
-  );
-}
-function RocketIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M14 3a7 7 0 0 1 7 7c0 3-2.3 5.9-4.6 8.2a1 1 0 0 1-.7.3H14l-2 2-1.2-3.2L7.6 16 10 14v-1.7a1 1 0 0 1 .3-.7C8 9.3 9 3 14 3Zm-1.5 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z"/>
-      <path d="M6 19c.7-.7 1.8-1 2.6-.2.8.8.5 1.9-.2 2.6-1 .9-2.9 1.3-3.4.8-.5-.5-.1-2.4.9-3.2Z" fill="#F59E0B"/>
-    </svg>
   );
 }
