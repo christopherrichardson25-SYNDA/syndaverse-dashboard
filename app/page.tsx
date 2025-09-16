@@ -2,12 +2,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import NavHeader from "../components/NavHeader";
 import ManifestoModal from "../components/ManifestoModal";
-// ⬇️ How we do it desde /components (requiere SVGR configurado)
-import HowWeDoIt from "../components/syndapsis_how_we_do_it.svg";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -21,15 +19,11 @@ const REPOS = {
 export default function Home() {
   const [manifestoOpen, setManifestoOpen] = useState(false);
 
-  useEffect(() => {
-    console.log("SYNDA page mounted");
-  }, []);
-
   return (
     <>
       <NavHeader />
 
-      {/* HERO */}
+      {/* HERO – ahora muestra SYNDAPSIS.png y la etiqueta debajo */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
@@ -50,22 +44,15 @@ export default function Home() {
                 >
                   Find out more
                 </button>
-                <a
-                  href={REPOS.truCalculator}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center rounded-full bg-white/10 px-5 py-2.5 font-semibold text-white ring-1 ring-white/30 hover:bg-white/15"
-                >
-                  Try TRU-e calculator
-                </a>
+                {/* (Se quitó el botón de TRU-e calculator del hero) */}
               </div>
             </div>
 
-            {/* Right visual → SYNDAPSIS.png con label debajo */}
+            {/* Visual derecho: SYNDAPSIS.png con etiqueta */}
             <div className="relative">
               <div className="rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 text-center">
-                <SyndapsisLogo className="mx-auto h-auto w-56 md:w-64" />
-                <div className="mt-2 text-2xl md:text-3xl font-extrabold tracking-wide text-sky-800">
+                <SyndapsisLogo className="mx-auto h-auto w-64 md:w-72" />
+                <div className="mt-3 text-2xl font-extrabold tracking-wide text-sky-800">
                   SYNDAPSIS
                 </div>
               </div>
@@ -74,17 +61,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The SYNDA Difference (4 cards + PLUS centrado + columna "=" + bridge.png) */}
+      {/* The SYNDA Difference – 4 cards + PLUS + “= bridge.png” nivelado */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
             The SYNDA Difference
           </h2>
 
-          {/* Tres columnas: [2x2 tiles] [ "=" ] [ bridge ] */}
-          <div className="grid items-center gap-8 md:[grid-template-columns:minmax(0,1fr)_64px_minmax(320px,1fr)]">
-            {/* LEFT: 2x2 grid con PLUS centrado */}
-            <div className="relative">
+          <div className="grid items-center gap-8 md:grid-cols-3">
+            {/* 2x2 grid con PLUS centrado */}
+            <div className="relative md:col-span-2">
               <div className="grid gap-6 sm:grid-cols-2">
                 <DiffCard
                   icon={<ShieldIcon />}
@@ -108,7 +94,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* PLUS centrado */}
+              {/* PLUS (centrado absoluto) */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
@@ -117,21 +103,19 @@ export default function Home() {
               </div>
             </div>
 
-            {/* MIDDLE: "=" nivelado con el centro del PLUS */}
-            <div className="hidden md:flex items-center justify-center">
-              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
-            </div>
-
-            {/* RIGHT: bridge.png después del "=" */}
-            <div className="flex items-center justify-center md:justify-start">
-              <Image
-                src="/bridge.png"
-                alt="Bridge: result of the four pillars"
-                width={720}
-                height={720}
-                className="h-auto w-full max-w-[420px] rounded-xl ring-1 ring-slate-200"
-                priority
-              />
+            {/* Columna derecha: símbolo “=” nivelado + bridge.png debajo */}
+            <div className="grid h-full place-items-center">
+              <div className="flex flex-col items-center">
+                <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+                <Image
+                  src="/bridge.png"
+                  alt="Bridge: from the invisible to the visible"
+                  width={280}
+                  height={160}
+                  className="mt-3 h-auto w-56 md:w-64"
+                  priority
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -156,16 +140,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How we do it — Syndapsis (SVG desde /components) */}
+      {/* How we do it — Syndapsis (si ya tienes un componente, puedes sustituir esta sección por <HowWeDoIt />) */}
       <section id="how" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
-
-          <div className="overflow-hidden rounded-2xl ring-1 ring-slate-200 bg-white p-4">
-            {/* Renderizado como React component via SVGR */}
-            <HowWeDoIt className="w-full h-auto" role="img" aria-label="Syndapsis — How we do it (4 steps)" />
+          <div className="grid gap-4 md:grid-cols-4">
+            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
+            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
+            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
+            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
           </div>
-
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
@@ -276,21 +260,18 @@ export default function Home() {
   );
 }
 
-/* ───────── Helpers & Icons ───────── */
+/* ───────── Helpers & Subcomponents ───────── */
 
-/** Muestra la imagen de Syndapsis probando varias rutas en /public
- *  para evitar problemas de mayúsculas/minúsculas.
- */
 function SyndapsisLogo({ className }: { className?: string }) {
+  // Fallback por diferencias de mayúsculas en /public
   const candidates = ["/SYNDAPSIS.png", "/Syndapsis.png", "/syndapsis.png"];
   const [idx, setIdx] = useState(0);
-
   return (
     <Image
       src={candidates[idx]}
       alt="Syndapsis"
-      width={280}
-      height={160}
+      width={300}
+      height={180}
       className={className}
       priority
       onError={() => setIdx((i) => (i + 1 < candidates.length ? i + 1 : i))}
@@ -312,7 +293,7 @@ function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text:
   );
 }
 
-/* Icons */
+/* Íconos */
 function ShieldIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
