@@ -94,24 +94,24 @@ export default function Home(){
 
               {/* PLUS centrado */}
               <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block">
-                <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
+                <span className="text-amber-400 text-5xl md:text-6xl font-black z-10">+</span>
               </div>
             </div>
 
             {/* "=" nivelado + bridge debajo */}
-            <div className="grid h-full place-items-center">
-              <div className="flex flex-col items-center">
-                <div className="text-slate-400 text-6xl leading-none font-light">=</div>
-                <Image
-                  src="/bridge.png"
-                  alt="Bridge: from the invisible to the visible"
-                  width={280}
-                  height={160}
-                  className="mt-3 h-auto w-56 md:w-64"
-                  priority
-                />
-              </div>
-            </div>
+            <div className="relative md:h-full">
+  <span aria-hidden className="absolute top-1/2 -translate-y-1/2 left-2 md:left-4 text-slate-400 text-6xl leading-none font-light">=</span>
+  <div className="flex h-full w-full items-center justify-center">
+    <Image
+      src="/bridge.png"
+      alt="Bridge: from the invisible to the visible"
+      width={280}
+      height={160}
+      className="ml-10 md:ml-12 h-auto w-56 md:w-64"
+      priority
+    />
+  </div>
+</div>
           </div>
         </div>
       </section>
