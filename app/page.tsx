@@ -4,11 +4,7 @@
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
 
-// Usa el que tengas:
 import NavHeader from "../components/NavHeader";
-// Si tu proyecto usa NavWhite en vez de NavHeader, cambia la línea anterior.
-
-// Modal (EN)
 import ManifestoModal from "../components/ManifestoModal";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
@@ -27,11 +23,10 @@ export default function Home() {
     <>
       <NavHeader />
 
-      {/* HERO: blue band + CTA (logo del header, no aquí) */}
+      {/* HERO */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
-            {/* Copy (EN) */}
             <div>
               <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl">
                 We make the invisible visible
@@ -60,7 +55,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: bridge image */}
+            {/* Right visual */}
             <div className="relative">
               <div className="rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200">
                 <Image
@@ -77,7 +72,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS) */}
+      {/* The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS) */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
@@ -85,7 +80,7 @@ export default function Home() {
           </h2>
 
           <div className="grid items-center gap-8 md:grid-cols-3">
-            {/* Grid 2x2 con PLUS centrado */}
+            {/* 2x2 grid with centered PLUS */}
             <div className="relative md:col-span-2">
               <div className="grid gap-6 sm:grid-cols-2">
                 <DiffCard
@@ -110,7 +105,7 @@ export default function Home() {
                 />
               </div>
 
-              {/* PLUS centrado (al estilo ALPAL) */}
+              {/* PLUS */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
@@ -118,23 +113,26 @@ export default function Home() {
                 <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
               </div>
             </div>
-{/* Columna derecha: = SYNDAPSIS con bajada */}
-<div className="flex flex-col items-center justify-center md:items-start">
-  <div className="text-slate-400 text-6xl leading-none font-light">=</div>
-  <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
-    SYNDAPSIS
-  </div>
-  <p className="mt-1 text-base font-medium text-slate-600">
-    Challenge Platform
-  </p>
-</div>
+
+            {/* Right column: = SYNDAPSIS (with subtitle) */}
+            <div className="flex flex-col items-center justify-center md:items-start">
+              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+              <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
+                SYNDAPSIS
+              </div>
+              <p className="mt-1 text-base font-medium text-slate-600">
+                Challenge Platform
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* What we do */}
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <Card
               title="Enterprises — TRU-e Onboarding"
               desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
@@ -285,7 +283,7 @@ function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text:
   );
 }
 
-/* Icons (puedes reemplazar por SVG/PNG propios) */
+/* Icons */
 function ShieldIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
