@@ -140,36 +140,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How we do it — Syndapsis (si ya tienes un componente, puedes sustituir esta sección por <HowWeDoIt />) */}
-      <section id="how" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
-            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
-            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
-            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndapsis}
-              target="_blank"
-              rel="noopener"
-            >
-              Open Syndapsis
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
-              href={REPOS.onboardingAgents}
-              target="_blank"
-              rel="noopener"
-            >
-              Onboarding Agents
-            </a>
-          </div>
-        </div>
-      </section>
+{/* How we do it — Enterprise */}
+<section id="how-enterprise" className="bg-white">
+  <div className="container mx-auto max-w-6xl px-4 py-12">
+    <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Enterprise</h2>
+    <div className="grid gap-4 md:grid-cols-4">
+      <Step n="1" title="Onboarding" desc="Company profile, goals and context. Access for key stakeholders." />
+      <Step n="2" title="TRU-e Evaluation" desc="Trust diagnostic: Pyramid level, Total Trust, and WTP↔Price Gap (IET/coherence)." />
+      <Step n="3" title="Results" desc="Insights & priorities from TRU-e; measurable targets and challenge brief." />
+      <Step n="4" title="Benchmark" desc="Industry benchmark vs peers and time trends to track progress." />
+    </div>
+  </div>
+</section>
+
+{/* How we do it — Agents */}
+<section id="how-agents" className="bg-white">
+  <div className="container mx-auto max-w-6xl px-4 py-12">
+    <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Agents</h2>
+    <div className="grid gap-4 md:grid-cols-4">
+      <Step n="1" title="Onboarding" desc="Anonymous sign-up and PTrust verification." />
+      <Step n="2" title="Syndaptic Evaluation" desc="Quick cognitive check + lateral interview (De Bono) to map superpowers." />
+      <Step n="3" title="Avatar Creation" desc="Public avatar with trust badge and 6-dimension superpower profile (0–100)." />
+      <Step n="4" title="Training" desc="Micro-trainings & tools to strengthen weak dimensions; ready for challenges." />
+    </div>
+  </div>
+</section>
+
+{/* How we do it — Syndapsis */}
+<section id="how" className="bg-white">
+  <div className="container mx-auto max-w-6xl px-4 py-12">
+    <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
+    <div className="grid gap-4 md:grid-cols-4">
+      <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
+      <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
+      <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
+      <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
+    </div>
+  </div>
+</section>
 
       {/* TRU-e calculator */}
       <section id="calculator" className="bg-white">
