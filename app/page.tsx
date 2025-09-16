@@ -118,24 +118,16 @@ export default function Home() {
                 <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
               </div>
             </div>
-
-            {/* Columna derecha: = SYNDAPSIS */}
-            <div className="flex flex-col items-center justify-center md:items-start">
-              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
-              <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
-                SYNDAPSIS
-              </div>
-              <a
-                className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-                href={REPOS.syndapsis}
-                target="_blank"
-                rel="noopener"
-              >
-                Open Syndapsis
-              </a>
-            </div>
-          </div>
-        </div>
+{/* Columna derecha: = SYNDAPSIS con bajada */}
+<div className="flex flex-col items-center justify-center md:items-start">
+  <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+  <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
+    SYNDAPSIS
+  </div>
+  <p className="mt-1 text-base font-medium text-slate-600">
+    Challenge Platform
+  </p>
+</div>
       </section>
 
       {/* What we do */}
