@@ -1,382 +1,317 @@
-// app/page.tsx
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useState, type ReactNode } from "react";
+import React, { useRef } from 'react';
+import Image from 'next/image';
 
-import NavHeader from "../components/NavHeader";
-import ManifestoModal from "../components/ManifestoModal";
+/**
+ * Syndapsis — Landing page
+ * - Hero with manifesto modal trigger ("Find out more")
+ * - "The SYNDΛ Difference" 4-tile diagram with centered "+" and "= SYNDAPSIS"
+ * - "How we do it" section using the SVG you uploaded to /public
+ * - Clean Tailwind layout, no external component deps
+ */
 
-const GH = "https://github.com/christopherrichardson25-SYNDA";
-const REPOS = {
-  onboardingEnterprise: `${GH}/onboarding-enterprises`,
-  onboardingAgents: `${GH}/onboarding-agents`,
-  truCalculator: `${GH}/tru-e-calculator`,
-  syndapsis: `${GH}/syndapsis-platform`,
-  syndatools: `${GH}/syndatools`,
-};
+export default function Page() {
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-export default function Home() {
-  const [manifestoOpen, setManifestoOpen] = useState(false);
+  const openModal = () => dialogRef.current?.showModal();
+  const closeModal = () => dialogRef.current?.close();
 
   return (
-    <>
-      <NavHeader />
+    <main className="min-h-screen bg-white text-slate-900">
+      {/* Hero */}
+      <section className="relative px-6 md:px-10 lg:px-16 py-16 md:py-24">
+        <div className="mx-auto max-w-6xl grid gap-10 md:grid-cols-2 items-center">
+          <div>
+            <p className="text-sm tracking-widest text-slate-500 uppercase">
+              Challenge Platform
+            </p>
+            <h1 className="mt-3 text-3xl md:text-5xl font-extrabold leading-tight">
+              We unite <span className="bg-clip-text text-transparent bg-gradient-to-br from-cyan-300 to-violet-600">science, resonance, and community</span>{' '}
+              to turn difference into superpower — transforming the invisible into creative force.
+            </h1>
 
-      {/* HERO */}
-      <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
-        <div className="container mx-auto max-w-6xl px-4 py-14">
-          <div className="grid items-center gap-8 md:grid-cols-2">
-            <div>
-              <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl">
-                We make the invisible visible
-              </h1>
-              <p className="mt-4 text-white/90 md:text-lg">
-                We unite <b>science</b>, <b>resonance</b>, and <b>community</b> to
-                turn <b>difference</b> into a <b>superpower</b> and transform the
-                invisible into a <b>creative force</b>.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => setManifestoOpen(true)}
-                  className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-                >
-                  Find out more
-                </button>
-                <a
-                  href={REPOS.truCalculator}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center rounded-full bg-white/10 px-5 py-2.5 font-semibold text-white ring-1 ring-white/30 hover:bg-white/15"
-                >
-                  Try TRU-e calculator
-                </a>
-              </div>
-            </div>
-
-            {/* Right visual */}
-            <div className="relative">
-              <div className="rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200">
-                <Image
-                  src="/bridge.png"
-                  alt="Bridge: from the invisible to the visible"
-                  width={720}
-                  height={720}
-                  className="h-auto w-full rounded-xl"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS with image) */}
-      <section id="difference" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
-            The SYNDA Difference
-          </h2>
-
-          <div className="grid items-center gap-8 md:grid-cols-3">
-            {/* 2x2 grid with centered PLUS */}
-            <div className="relative md:col-span-2">
-              <div className="grid gap-6 sm:grid-cols-2">
-                <DiffCard
-                  icon={<ShieldIcon />}
-                  title="Anonymity First"
-                  text="Protects identities → removes bias → only merit matters."
-                />
-                <DiffCard
-                  icon={<MedalIcon />}
-                  title="Challenge-based Meritocracy"
-                  text="Talent is measured by solving real challenges, not resumes."
-                />
-                <DiffCard
-                  icon={<NetworkIcon />}
-                  title="Collective Intelligence"
-                  text="A “super-brain” of diverse minds achieving the impossible."
-                />
-                <DiffCard
-                  icon={<BulbIcon />}
-                  title="Impact Innovation"
-                  text="Transforms the invisible into visible results for business and society."
-                />
-              </div>
-
-              {/* PLUS */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={openModal}
+                className="inline-flex items-center rounded-xl px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-cyan-400 to-violet-600 shadow-lg shadow-violet-600/20 hover:opacity-95 focus:outline-none"
               >
-                <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
+                Find out more
+              </button>
+              <a
+                href="#how"
+                className="inline-flex items-center rounded-xl px-5 py-3 text-sm font-semibold border border-slate-200 hover:bg-slate-50"
+              >
+                How we do it
+              </a>
+            </div>
+          </div>
+
+          {/* Optional visual (brain/synapse mark placeholder area) */}
+          <div className="relative">
+            <div className="aspect-[4/3] w-full rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 ring-1 ring-slate-200/80 p-6 flex items-center justify-center">
+              <svg width="100%" height="100%" viewBox="0 0 520 390" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#67e8f9" />
+                    <stop offset="100%" stopColor="#7c3aed" />
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                {/* stylized brain outline */}
+                <path
+                  d="M140,210c-40-30-50-110,20-130c20-40,110-50,140-10c50-20,110,10,110,70c50,10,40,120-40,130c-10,30-40,50-80,40c-20,20-60,20-90-5c-30,10-60-5-60-35"
+                  fill="none"
+                  stroke="url(#g)"
+                  strokeWidth="6"
+                  opacity="0.8"
+                  filter="url(#glow)"
+                />
+                {/* synapse nodes */}
+                {[
+                  [260,180],[210,140],[310,130],[360,180],[310,230],[210,230],[260,120]
+                ].map(([x,y],i)=>(
+                  <g key={i}>
+                    <line x1="260" y1="180" x2={x} y2={y} stroke="url(#g)" strokeWidth="3" />
+                    <circle cx={x} cy={y} r="7" fill="url(#g)" />
+                  </g>
+                ))}
+                <circle cx="260" cy="180" r="10" fill="url(#g)" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The SYNDΛ Difference (4 tiles with center + and "= SYNDAPSIS") */}
+      <section className="px-6 md:px-10 lg:px-16 py-10 md:py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-2xl md:text-3xl font-bold">The SYNDΛ Difference</h2>
+          <p className="mt-2 text-slate-600">Four pillars combining into a single operating system for challenges.</p>
+
+          <div className="relative mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* tiles */}
+            <Tile
+              title="Science"
+              body="Evidence, data standards, and measurable outcomes. No mysticism—just verifiable progress."
+              icon={
+                <AtomIcon />
+              }
+            />
+            <Tile
+              title="Resonance"
+              body="Match problems with minds through cognitive fit and team coherence for creative breakthroughs."
+              icon={<WaveIcon />}
+            />
+            <Tile
+              title="Community"
+              body="Anonymous avatars, mentoring, and shared XP. Talent thrives without social noise."
+              icon={<UsersIcon />}
+            />
+            <Tile
+              title="Merit"
+              body="Transparent scoring and rewards. AHP-based evaluation aligned with what matters to the company."
+              icon={<TrophyIcon />}
+            />
+
+            {/* Center plus */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 to-violet-600 text-white text-3xl font-extrabold flex items-center justify-center select-none shadow-lg">
+                +
               </div>
             </div>
+          </div>
 
-            {/* Right column: = image + label */}
-            <div className="flex flex-col items-center justify-center md:items-start">
-              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+          {/* Equals SYNDAPSIS */}
+          <div className="mt-6 flex items-center justify-center gap-3 text-xl md:text-2xl font-extrabold">
+            <span className="text-slate-400">=</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-violet-600">SYNDAPSIS</span>
+          </div>
+        </div>
+      </section>
 
-              {/* Usa el nombre exacto del archivo en /public (sensible a mayúsculas) */}
-              <Image
-                src="/SYNDAPSIS.png"
-                alt="Syndapsis"
-                width={280}
-                height={160}
-                className="mt-3 h-auto w-56 md:w-64"
-                priority
+      {/* How we do it (SVG from /public) */}
+      <section id="how" className="px-6 md:px-10 lg:px-16 py-12 md:py-20 bg-slate-50">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl md:text-3xl font-bold">How we do it</h2>
+            <a href="#manifesto" className="text-sm font-semibold underline decoration-slate-300 hover:decoration-slate-500">
+              Read manifesto
+            </a>
+          </div>
+          <div className="mt-8 rounded-2xl overflow-hidden ring-1 ring-slate-200 bg-white">
+            <Image
+              src="/syndapsis_how_we_do_it.svg"
+              alt="Syndapsis — How we do it (4 steps)"
+              width={1200}
+              height={520}
+              className="w-full h-auto"
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-6 md:px-10 lg:px-16 py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <h3 className="text-2xl md:text-3xl font-bold">Ready to post a challenge?</h3>
+          <p className="mt-2 text-slate-600">Define your brief, criteria and prize. We’ll build the right team and deliver a scored shortlist.</p>
+          <div className="mt-6">
+            <a
+              href="/challenge/new"
+              className="inline-flex items-center rounded-xl px-6 py-3 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800"
+            >
+              Create Challenge
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Manifesto Modal (native <dialog>) */}
+      <dialog
+        ref={dialogRef}
+        className="backdrop:bg-black/40 rounded-2xl p-0 w-[min(720px,92vw)]"
+        aria-labelledby="manifesto-title"
+      >
+        <div id="manifesto" className="bg-white rounded-2xl overflow-hidden">
+          <div className="px-6 md:px-8 pt-6 pb-4">
+            <h4 id="manifesto-title" className="text-xl md:text-2xl font-extrabold">
+              SYNDA Manifesto
+            </h4>
+            <p className="mt-3 text-slate-700">
+              We believe neurodivergences are sensitive antennas announcing the next stage of humanity. We unite science, resonance,
+              and community to convert difference into superpower and transform the invisible into creative force. Our purpose:
+              think differently to solve the impossible and guide a new human evolution.
+            </p>
+
+            <div className="mt-6 grid gap-4">
+              <ManifestoPoint
+                title="Biological base: DNA as an open system"
+                bullets={[
+                  'Gene expression responds to environment and context (epigenetics).',
+                  'Neurodivergence expresses alternative cognitive strategies for the species.',
+                  'Health, stress and electromagnetic environments modulate expression.'
+                ]}
               />
-
-              <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
-                SYNDAPSIS
-              </div>
+              <ManifestoPoint
+                title="Brain & resonance"
+                bullets={[
+                  'Cognition emerges from patterns and synchronization across networks.',
+                  'Teams resonate when complementary profiles lock into a coherent problem frame.',
+                  'We operationalize this with standardized briefs, data rooms and scored decisions.'
+                ]}
+              />
+              <ManifestoPoint
+                title="Merit & transparency"
+                bullets={[
+                  'AHP multi-criteria scoring aligned with company goals.',
+                  'Anonymous avatars, mentorship, XP and audit trails to reward real outcomes.'
+                ]}
+              />
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* What we do */}
-      <section id="what" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card
-              title="Enterprises — TRU-e Onboarding"
-              desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
-              cta={{ label: "Onboarding Enterprise", href: REPOS.onboardingEnterprise }}
-            />
-            <Card
-              title="Agents — PTrust + Lateral interview"
-              desc="Verification + superpowers (De Bono). Compete on merit, not identity."
-              cta={{ label: "Onboarding Agents", href: REPOS.onboardingAgents }}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How we do it — Syndapsis */}
-      <section id="how" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
-            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
-            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
-            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndapsis}
-              target="_blank"
-              rel="noopener"
+          <div className="px-6 md:px-8 py-4 bg-slate-50 flex items-center justify-end gap-3">
+            <button
+              onClick={closeModal}
+              className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold border border-slate-200 hover:bg-white"
             >
-              Open Syndapsis
-            </a>
+              Close
+            </button>
             <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
-              href={REPOS.onboardingAgents}
-              target="_blank"
-              rel="noopener"
+              href="#how"
+              onClick={closeModal}
+              className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800"
             >
-              Onboarding Agents
+              See the process
             </a>
           </div>
         </div>
-      </section>
-
-      {/* TRU-e calculator */}
-      <section id="calculator" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">TRU-e calculator</h2>
-          <p className="text-slate-700">Try the TRU-e method and get a quick motivational result.</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.truCalculator}
-              target="_blank"
-              rel="noopener"
-            >
-              Open TRU-e Calculator
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-white"
-              href={REPOS.onboardingEnterprise}
-              target="_blank"
-              rel="noopener"
-            >
-              Start TRU-e
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Who we are */}
-      <section id="who" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <ListCard
-              title="Values"
-              items={[
-                "Merit and evidence (TRU-e / PTrust)",
-                "Privacy and respect for neurodiversity",
-                "Transparent criteria (AHP) and outcomes",
-              ]}
-            />
-            <ListCard
-              title="Different from traditional inclusive hiring"
-              items={[
-                "We don't place jobs — we solve problems",
-                "Match by superpowers, not by CV",
-                "Reward for outcomes; reputation for trust",
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Syndatools */}
-      <section id="syndatools" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">
-            Syndatools — Apps, agents & knowledge
-          </h2>
-          <p className="text-slate-700">
-            Marketplace to power companies and agents. Includes Syndabooks.
-          </p>
-          <div className="mt-4">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndatools}
-              target="_blank"
-              rel="noopener"
-            >
-              Open Syndatools
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Privacy */}
-      <section id="privacy" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">Privacy Policy</h2>
-          <p className="text-slate-700">
-            Minimal data, encryption and explicit consent. Agent identities are protected; merit is evaluated.
-          </p>
-        </div>
-      </section>
-
-      {/* Manifesto modal */}
-      <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
-    </>
+      </dialog>
+    </main>
   );
 }
 
-/* ───────── Subcomponents ───────── */
+/* ---------- Small UI bits (no external libs) ---------- */
 
-function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col items-center text-center md:items-start md:text-left">
-        <div className="mb-4 grid h-16 w-16 place-items-center rounded-xl bg-sky-50 text-sky-700">
-          {icon}
-        </div>
-        <h3 className="text-2xl font-semibold text-slate-900">{title}</h3>
-        <p className="mt-2 text-[15px] leading-relaxed text-slate-600">{text}</p>
-      </div>
-    </div>
-  );
-}
-
-/* Icons */
-function ShieldIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 2l7 3v6c0 5-3.6 8.9-7 10-3.4-1.1-7-5-7-10V5l7-3Z" />
-      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981"/>
-    </svg>
-  );
-}
-function MedalIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M8 3h8l-2.5 5H10.5L8 3Z" />
-      <circle cx="12" cy="14" r="5" />
-      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B"/>
-    </svg>
-  );
-}
-function NetworkIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <circle cx="6" cy="6" r="2.2" />
-      <circle cx="18" cy="6" r="2.2" />
-      <circle cx="12" cy="18" r="2.2" />
-      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none"/>
-    </svg>
-  );
-}
-function BulbIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z"/>
-      <rect x="9" y="19" width="6" height="2" rx="1" />
-      <path d="M9 22h6" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function Card({
+function Tile({
   title,
-  desc,
-  cta,
+  body,
+  icon,
 }: {
   title: string;
-  desc: string;
-  cta: { label: string; href: string };
+  body: string;
+  icon: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-slate-700">{desc}</p>
-      <a
-        className="mt-3 inline-flex items-center rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50"
-        href={cta.href}
-        target="_blank"
-        rel="noopener"
-      >
-        {cta.label}
-      </a>
-    </div>
-  );
-}
-
-function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 font-bold text-slate-800">
-          {n}
-        </span>
-        <h3 className="font-semibold text-slate-900">{title}</h3>
+    <div className="relative rounded-2xl border border-slate-200 bg-white p-5 md:p-6 shadow-sm">
+      <div className="flex items-start gap-4">
+        <div className="shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-100 to-violet-100 ring-1 ring-slate-200 flex items-center justify-center">
+            <div className="w-6 h-6 text-violet-700">{icon}</div>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">{title}</h3>
+          <p className="mt-1 text-sm text-slate-600">{body}</p>
+        </div>
       </div>
-      <p className="mt-1 text-slate-700">{desc}</p>
     </div>
   );
 }
 
-function ListCard({ title, items }: { title: string; items: string[] }) {
+function ManifestoPoint({ title, bullets }: { title: string; bullets: string[] }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <ul className="mt-2 list-disc pl-5 text-slate-700">
-        {items.map((it) => (
-          <li key={it}>{it}</li>
+    <div>
+      <h5 className="font-semibold">{title}</h5>
+      <ul className="mt-2 list-disc pl-5 text-slate-700 text-sm space-y-1">
+        {bullets.map((b, i) => (
+          <li key={i}>{b}</li>
         ))}
       </ul>
     </div>
+  );
+}
+
+/* Simple inline icons (no dependencies) */
+function AtomIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth="1.8" />
+      <ellipse cx="12" cy="12" rx="9" ry="4.5" stroke="currentColor" strokeWidth="1.8" />
+      <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+function WaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M2 12c3 0 3-6 6-6s3 12 6 12 3-6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+function UsersIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3 20c0-3.5 3-5.5 6-5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="17" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M14 20c0-2.8 2.4-4.4 4.5-4.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+function TrophyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M8 4h8v4a4 4 0 0 1-8 0V4Z" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 12v3M8 21h8M6 8H5a3 3 0 0 1-3-3V4h4M18 8h1a3 3 0 0 0 3-3V4h-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }
