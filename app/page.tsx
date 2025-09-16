@@ -2,12 +2,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
-// Si tu nav se llama distinto, ajusta la importación:
+// Usa el que tengas:
 import NavHeader from "../components/NavHeader";
-// Si usas NavWhite, cambia a: import NavWhite from "../components/NavWhite";
+// Si tu proyecto usa NavWhite en vez de NavHeader, cambia la línea anterior.
 
+// Modal (EN)
 import ManifestoModal from "../components/ManifestoModal";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
@@ -25,9 +26,8 @@ export default function Home() {
   return (
     <>
       <NavHeader />
-      {/* <NavWhite />  // usa este si tu proyecto no tiene NavHeader */}
 
-      {/* HERO: blue band + CTA (no logo dentro del hero) */}
+      {/* HERO: blue band + CTA (logo del header, no aquí) */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
@@ -60,7 +60,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: replace TRU-e snapshot with bridge.png */}
+            {/* Right: bridge image */}
             <div className="relative">
               <div className="rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200">
                 <Image
@@ -77,72 +77,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── The SYNDA Difference (con + y = SYNDAPSIS) ───────── */}
-<section id="difference" className="bg-white">
-  <div className="container mx-auto max-w-6xl px-4 py-12">
-    <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
-      The SYNDA Difference
-    </h2>
+      {/* ───────── The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS) */}
+      <section id="difference" className="bg-white">
+        <div className="container mx-auto max-w-6xl px-4 py-12">
+          <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
+            The SYNDA Difference
+          </h2>
 
-    <div className="grid items-center gap-8 md:grid-cols-3">
-      {/* Bloque 2x2 con + centrado */}
-      <div className="relative md:col-span-2">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <DiffCard
-            icon={<ShieldIcon />}
-            title="Anonymity First"
-            text="Protects identities → removes bias → only merit matters."
-          />
-          <DiffCard
-            icon={<MedalIcon />}
-            title="Challenge-based Meritocracy"
-            text="Talent is measured by solving real challenges, not resumes."
-          />
-          <DiffCard
-            icon={<NetworkIcon />}
-            title="Collective Intelligence"
-            text="A “super-brain” of diverse minds achieving the impossible."
-          />
-          <DiffCard
-            icon={<BulbIcon />}
-            title="Impact Innovation"
-            text="Transforms the invisible into visible results for business and society."
-          />
-        </div>
+          <div className="grid items-center gap-8 md:grid-cols-3">
+            {/* Grid 2x2 con PLUS centrado */}
+            <div className="relative md:col-span-2">
+              <div className="grid gap-6 sm:grid-cols-2">
+                <DiffCard
+                  icon={<ShieldIcon />}
+                  title="Anonymity First"
+                  text="Protects identities → removes bias → only merit matters."
+                />
+                <DiffCard
+                  icon={<MedalIcon />}
+                  title="Challenge-based Meritocracy"
+                  text="Talent is measured by solving real challenges, not resumes."
+                />
+                <DiffCard
+                  icon={<NetworkIcon />}
+                  title="Collective Intelligence"
+                  text="A “super-brain” of diverse minds achieving the impossible."
+                />
+                <DiffCard
+                  icon={<BulbIcon />}
+                  title="Impact Innovation"
+                  text="Transforms the invisible into visible results for business and society."
+                />
+              </div>
 
-        {/* PLUS centrado sobre la grilla */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
-        >
-          <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
-        </div>
-      </div>
+              {/* PLUS centrado (al estilo ALPAL) */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
+              >
+                <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
+              </div>
+            </div>
 
-      {/* Columna derecha: = SYNDAPSIS */}
-      <div className="flex flex-col items-center md:items-start justify-center">
-        <div className="text-slate-400 text-6xl leading-none font-light">=</div>
-        <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
-          SYNDAPSIS
+            {/* Columna derecha: = SYNDAPSIS */}
+            <div className="flex flex-col items-center justify-center md:items-start">
+              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+              <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
+                SYNDAPSIS
+              </div>
+              <a
+                className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
+                href={REPOS.syndapsis}
+                target="_blank"
+                rel="noopener"
+              >
+                Open Syndapsis
+              </a>
+            </div>
+          </div>
         </div>
-        <a
-          className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-          href={REPOS.syndapsis}
-          target="_blank"
-          rel="noopener"
-        >
-          Open Syndapsis
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* What we do */}
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
             <Card
               title="Enterprises — TRU-e Onboarding"
               desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
@@ -192,9 +192,7 @@ export default function Home() {
       <section id="calculator" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-2 text-xl font-semibold text-slate-900">TRU-e calculator</h2>
-          <p className="text-slate-700">
-            Try the TRU-e method and get a quick motivational result.
-          </p>
+          <p className="text-slate-700">Try the TRU-e method and get a quick motivational result.</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
@@ -281,7 +279,7 @@ export default function Home() {
 
 /* ───────── Subcomponents ───────── */
 
-function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col items-center text-center md:items-start md:text-left">
@@ -295,33 +293,40 @@ function DiffCard({ icon, title, text }: { icon: React.ReactNode; title: string;
   );
 }
 
-/* Icons */
-function MaskIcon() {
+/* Icons (puedes reemplazar por SVG/PNG propios) */
+function ShieldIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 5c4.5 0 8 1.2 8 3.5 0 3.9-3.6 7.3-8 9.5-4.4-2.2-8-5.6-8-9.5C4 6.2 7.5 5 12 5Zm-4.8 4a2.2 2.2 0 1 0 0 4.4A2.2 2.2 0 0 0 7.2 9Zm9.6 0a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z"/>
+      <path d="M12 2l7 3v6c0 5-3.6 8.9-7 10-3.4-1.1-7-5-7-10V5l7-3Z" />
+      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981"/>
     </svg>
   );
 }
-function TrophyIcon() {
+function MedalIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M6 3h12v2h2a2 2 0 0 1-2 2h-1.1A6.9 6.9 0 0 1 13 12.9V15h3v2H8v-2h3v-2.1A6.9 6.9 0 0 1 7.1 7H6A2 2 0 0 1 4 5h2V3Zm12 2V4H6v1h1.1a5 5 0 1 0 9.8 0H18Z"/>
+      <path d="M8 3h8l-2.5 5H10.5L8 3Z" />
+      <circle cx="12" cy="14" r="5" />
+      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B"/>
     </svg>
   );
 }
-function PuzzleIcon() {
+function NetworkIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M13 3a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v2h-1a2 2 0 1 0 0 4h1v2a2 2 0 0 1-2 2h-2v-1a2 2 0 1 0-4 0v1H8a2 2 0 0 1-2-2v-2h1a2 2 0 1 0 0-4H6V8a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2Z"/>
+      <circle cx="6" cy="6" r="2.2" />
+      <circle cx="18" cy="6" r="2.2" />
+      <circle cx="12" cy="18" r="2.2" />
+      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none"/>
     </svg>
   );
 }
-function RocketIcon() {
+function BulbIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M14 3a7 7 0 0 1 7 7c0 3-2.3 5.9-4.6 8.2a1 1 0 0 1-.7.3H14l-2 2-1.2-3.2L7.6 16 10 14v-1.7a1 1 0 0 1 .3-.7C8 9.3 9 3 14 3Zm-1.5 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z"/>
-      <path d="M6 19c.7-.7 1.8-1 2.6-.2.8.8.5 1.9-.2 2.6-1 .9-2.9 1.3-3.4.8-.5-.5-.1-2.4.9-3.2Z" fill="#F59E0B"/>
+      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z"/>
+      <rect x="9" y="19" width="6" height="2" rx="1" />
+      <path d="M9 22h6" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -375,41 +380,5 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
         ))}
       </ul>
     </div>
-  );
-}
-function ShieldIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 2l7 3v6c0 5-3.6 8.9-7 10-3.4-1.1-7-5-7-10V5l7-3Z" />
-      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981"/>
-    </svg>
-  );
-}
-function MedalIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M8 3h8l-2.5 5H10.5L8 3Z" />
-      <circle cx="12" cy="14" r="5" />
-      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B"/>
-    </svg>
-  );
-}
-function NetworkIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <circle cx="6" cy="6" r="2.2" />
-      <circle cx="18" cy="6" r="2.2" />
-      <circle cx="12" cy="18" r="2.2" />
-      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none"/>
-    </svg>
-  );
-}
-function BulbIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z"/>
-      <rect x="9" y="19" width="6" height="2" rx="1" />
-      <path d="M9 22h6" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
   );
 }
