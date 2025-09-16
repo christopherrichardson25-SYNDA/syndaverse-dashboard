@@ -1,11 +1,10 @@
-// app/page.tsx
 "use client";
 
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
 
-import NavHeader from "../components/NavHeader";
 import ManifestoModal from "../components/ManifestoModal";
+import NavHeader from "../components/NavHeader"; // si tu header se llama Nav.tsx, cambia esta línea
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -16,14 +15,14 @@ const REPOS = {
   syndatools: `${GH}/syndatools`,
 };
 
-export default function Home() {
-  const [manifestoOpen, setManifestoOpen] = useState(false);
+export default function Home(){
+  const [manifestoOpen,setManifestoOpen]=useState(false);
 
   return (
     <>
       <NavHeader />
 
-      {/* HERO – ahora muestra SYNDAPSIS.png y la etiqueta debajo */}
+      {/* HERO — SYNDAPSIS.png + etiqueta; solo "Find out more" */}
       <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
@@ -39,18 +38,17 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => setManifestoOpen(true)}
-                  className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
+                  onClick={()=>setManifestoOpen(true)}
+                  className="btn-primary"
                 >
                   Find out more
                 </button>
-                {/* (Se quitó el botón de TRU-e calculator del hero) */}
               </div>
             </div>
 
-            {/* Visual derecho: SYNDAPSIS.png con etiqueta */}
+            {/* Visual derecho: SYNDAPSIS.png + label */}
             <div className="relative">
-              <div className="rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 text-center">
+              <div className="card p-4 text-center">
                 <SyndapsisLogo className="mx-auto h-auto w-64 md:w-72" />
                 <div className="mt-3 text-2xl font-extrabold tracking-wide text-sky-800">
                   SYNDAPSIS
@@ -61,7 +59,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The SYNDA Difference – 4 cards + PLUS + “= bridge.png” nivelado */}
+      {/* The SYNDA Difference — 4 cards + PLUS + "=" + bridge.png */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
@@ -94,16 +92,13 @@ export default function Home() {
                 />
               </div>
 
-              {/* PLUS (centrado absoluto) */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
-              >
+              {/* PLUS centrado */}
+              <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block">
                 <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
               </div>
             </div>
 
-            {/* Columna derecha: símbolo “=” nivelado + bridge.png debajo */}
+            {/* "=" nivelado + bridge debajo */}
             <div className="grid h-full place-items-center">
               <div className="flex flex-col items-center">
                 <div className="text-slate-400 text-6xl leading-none font-light">=</div>
@@ -140,7 +135,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How we do it — Syndapsis (si ya tienes un componente, puedes sustituir esta sección por <HowWeDoIt />) */}
+      {/* How we do it — Syndapsis (si migraste a componente, impórtalo y úsalo aquí) */}
       <section id="how" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
@@ -149,75 +144,6 @@ export default function Home() {
             <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
             <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
             <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndapsis}
-              target="_blank"
-              rel="noopener"
-            >
-              Open Syndapsis
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
-              href={REPOS.onboardingAgents}
-              target="_blank"
-              rel="noopener"
-            >
-              Onboarding Agents
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* TRU-e calculator */}
-      <section id="calculator" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">TRU-e calculator</h2>
-          <p className="text-slate-700">Try the TRU-e method and get a quick motivational result.</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.truCalculator}
-              target="_blank"
-              rel="noopener"
-            >
-              Open TRU-e Calculator
-            </a>
-            <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-white"
-              href={REPOS.onboardingEnterprise}
-              target="_blank"
-              rel="noopener"
-            >
-              Start TRU-e
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Who we are */}
-      <section id="who" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <ListCard
-              title="Values"
-              items={[
-                "Merit and evidence (TRU-e / PTrust)",
-                "Privacy and respect for neurodiversity",
-                "Transparent criteria (AHP) and outcomes",
-              ]}
-            />
-            <ListCard
-              title="Different from traditional inclusive hiring"
-              items={[
-                "We don't place jobs — we solve problems",
-                "Match by superpowers, not by CV",
-                "Reward for outcomes; reputation for trust",
-              ]}
-            />
           </div>
         </div>
       </section>
@@ -232,12 +158,7 @@ export default function Home() {
             Marketplace to power companies and agents. Includes Syndabooks.
           </p>
           <div className="mt-4">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndatools}
-              target="_blank"
-              rel="noopener"
-            >
+            <a className="btn-primary" href={REPOS.syndatools} target="_blank" rel="noopener">
               Open Syndatools
             </a>
           </div>
@@ -254,18 +175,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Manifesto modal */}
-      <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
+      <ManifestoModal open={manifestoOpen} onClose={()=>setManifestoOpen(false)} />
     </>
   );
 }
 
-/* ───────── Helpers & Subcomponents ───────── */
-
-function SyndapsisLogo({ className }: { className?: string }) {
-  // Fallback por diferencias de mayúsculas en /public
-  const candidates = ["/SYNDAPSIS.png", "/Syndapsis.png", "/syndapsis.png"];
-  const [idx, setIdx] = useState(0);
+/* === Helpers === */
+function SyndapsisLogo({ className }:{ className?:string }){
+  // Fallback por si el archivo en /public tiene otra capitalización
+  const candidates=["/SYNDAPSIS.png","/Syndapsis.png","/syndapsis.png"];
+  const [idx,setIdx]=useState(0);
   return (
     <Image
       src={candidates[idx]}
@@ -274,14 +193,14 @@ function SyndapsisLogo({ className }: { className?: string }) {
       height={180}
       className={className}
       priority
-      onError={() => setIdx((i) => (i + 1 < candidates.length ? i + 1 : i))}
+      onError={()=>setIdx(i=> (i+1<candidates.length? i+1 : i))}
     />
   );
 }
 
-function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+function DiffCard({icon,title,text}:{icon:ReactNode;title:string;text:string;}){
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="card p-6">
       <div className="flex flex-col items-center text-center md:items-start md:text-left">
         <div className="mb-4 grid h-16 w-16 place-items-center rounded-xl bg-sky-50 text-sky-700">
           {icon}
@@ -293,92 +212,64 @@ function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text:
   );
 }
 
-/* Íconos */
-function ShieldIcon() {
+/* Icons */
+function ShieldIcon(){
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M12 2l7 3v6c0 5-3.6 8.9-7 10-3.4-1.1-7-5-7-10V5l7-3Z" />
-      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981" />
+      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981"/>
     </svg>
   );
 }
-function MedalIcon() {
+function MedalIcon(){
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M8 3h8l-2.5 5H10.5L8 3Z" />
       <circle cx="12" cy="14" r="5" />
-      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B" />
+      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B"/>
     </svg>
   );
 }
-function NetworkIcon() {
+function NetworkIcon(){
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <circle cx="6" cy="6" r="2.2" />
       <circle cx="18" cy="6" r="2.2" />
       <circle cx="12" cy="18" r="2.2" />
-      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none" />
+      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none"/>
     </svg>
   );
 }
-function BulbIcon() {
+function BulbIcon(){
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z" />
+      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z"/>
       <rect x="9" y="19" width="6" height="2" rx="1" />
       <path d="M9 22h6" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
 
-function Card({
-  title,
-  desc,
-  cta,
-}: {
-  title: string;
-  desc: string;
-  cta: { label: string; href: string };
-}) {
+function Card({title,desc,cta}:{title:string;desc:string;cta:{label:string;href:string};}){
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="card p-5">
       <h3 className="font-semibold text-slate-900">{title}</h3>
       <p className="mt-1 text-slate-700">{desc}</p>
-      <a
-        className="mt-3 inline-flex items-center rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50"
-        href={cta.href}
-        target="_blank"
-        rel="noopener"
-      >
+      <a className="btn-outline mt-3" href={cta.href} target="_blank" rel="noopener">
         {cta.label}
       </a>
     </div>
   );
 }
 
-function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
+function Step({n,title,desc}:{n:string;title:string;desc:string;}){
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="card p-5">
       <div className="flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 font-bold text-slate-800">
-          {n}
-        </span>
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 font-bold text-slate-800">{n}</span>
         <h3 className="font-semibold text-slate-900">{title}</h3>
       </div>
       <p className="mt-1 text-slate-700">{desc}</p>
-    </div>
-  );
-}
-
-function ListCard({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <ul className="mt-2 list-disc pl-5 text-slate-700">
-        {items.map((it) => (
-          <li key={it}>{it}</li>
-        ))}
-      </ul>
     </div>
   );
 }
