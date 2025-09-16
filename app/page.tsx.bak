@@ -120,10 +120,18 @@ export default function Home(){
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-          <p className="mt-2 text-slate-800 text-lg md:text-xl max-w-3xl">We connect agents with cognitive superpowers who solve complex problems for society and companies in innovative ways. Both companies and agents complete an onboarding to interact through our challenge platform, <b>Syndapsis</b>.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a className="btn-primary" href={REPOS.onboardingEnterprise} target="_blank" rel="noopener">Onboarding Enterprise</a>
-            <a className="btn-outline" href={REPOS.onboardingAgents} target="_blank" rel="noopener">Onboarding Agents</a>
+          <p className="text-[15px] text-slate-700 max-w-3xl mt-1">We connect agents with cognitive superpowers who solve complex problems for society and companies in innovative ways. Both companies and agents complete an onboarding to interact through our challenge platform, <b>Syndapsis</b>.</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card
+              title="Enterprises — TRU-e Onboarding"
+              desc="Onboard your organization to brief challenges on Syndapsis. Measure Brand Level, IET, and WTP↔Price Gap to focus priorities."
+              cta={{ label: "Onboarding Enterprise", href: REPOS.onboardingEnterprise }}
+            />
+            <Card
+              title="Agents — PTrust + Lateral interview"
+              desc="Verify identity & PTrust, map lateral-thinking superpowers, and start competing on Syndapsis."
+              cta={{ label: "Onboarding Agents", href: REPOS.onboardingAgents }}
+            />
           </div>
         </div>
       </section>
