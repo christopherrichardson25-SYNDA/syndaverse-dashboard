@@ -72,7 +72,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS) */}
+      {/* The SYNDA Difference (4 cards + PLUS + = SYNDAPSIS with image) */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
@@ -114,25 +114,25 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right column: = + image + label */}
-<div className="flex flex-col items-center justify-center md:items-start">
-  <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+            {/* Right column: = image + label */}
+            <div className="flex flex-col items-center justify-center md:items-start">
+              <div className="text-slate-400 text-6xl leading-none font-light">=</div>
 
-  {/* Imagen de Syndapsis (en /public). Ajusta el nombre si tu archivo difiere en mayúsculas/minúsculas */}
-  <Image
-    src="/SYNDAPSIS.png"   // o "/Syndapsis.png" según tu archivo real
-    alt="Syndapsis"
-    width={280}
-    height={160}
-    className="mt-3 h-auto w-56 md:w-64"
-    priority
-  />
+              {/* Usa el nombre exacto del archivo en /public (sensible a mayúsculas) */}
+              <Image
+                src="/SYNDAPSIS.png"
+                alt="Syndapsis"
+                width={280}
+                height={160}
+                className="mt-3 h-auto w-56 md:w-64"
+                priority
+              />
 
-  <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
-    SYNDAPSIS
-  </div>
-</div>
-
+              <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
+                SYNDAPSIS
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
