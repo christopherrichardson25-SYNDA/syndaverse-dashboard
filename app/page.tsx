@@ -77,37 +77,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── The SYNDA Difference */}
-      <section id="difference" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-6 text-center text-3xl font-semibold leading-tight text-slate-900 md:text-left">
-            The SYNDA Difference
-          </h2>
+      {/* ───────── The SYNDA Difference (con + y = SYNDAPSIS) ───────── */}
+<section id="difference" className="bg-white">
+  <div className="container mx-auto max-w-6xl px-4 py-12">
+    <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
+      The SYNDA Difference
+    </h2>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <DiffCard
-              icon={<MaskIcon />}
-              title="Anonymity First"
-              text="Protects identities → removes bias → only merit matters."
-            />
-            <DiffCard
-              icon={<TrophyIcon />}
-              title="Challenge-based Meritocracy"
-              text="Talent is measured by solving real challenges, not resumes."
-            />
-            <DiffCard
-              icon={<PuzzleIcon />}
-              title="Collective Intelligence"
-              text="A “super-brain” of diverse minds achieving the impossible."
-            />
-            <DiffCard
-              icon={<RocketIcon />}
-              title="Impact Innovation"
-              text="Transforms the invisible into visible results for business and society."
-            />
-          </div>
+    <div className="grid items-center gap-8 md:grid-cols-3">
+      {/* Bloque 2x2 con + centrado */}
+      <div className="relative md:col-span-2">
+        <div className="grid gap-6 sm:grid-cols-2">
+          <DiffCard
+            icon={<ShieldIcon />}
+            title="Anonymity First"
+            text="Protects identities → removes bias → only merit matters."
+          />
+          <DiffCard
+            icon={<MedalIcon />}
+            title="Challenge-based Meritocracy"
+            text="Talent is measured by solving real challenges, not resumes."
+          />
+          <DiffCard
+            icon={<NetworkIcon />}
+            title="Collective Intelligence"
+            text="A “super-brain” of diverse minds achieving the impossible."
+          />
+          <DiffCard
+            icon={<BulbIcon />}
+            title="Impact Innovation"
+            text="Transforms the invisible into visible results for business and society."
+          />
         </div>
-      </section>
+
+        {/* PLUS centrado sobre la grilla */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
+        >
+          <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
+        </div>
+      </div>
+
+      {/* Columna derecha: = SYNDAPSIS */}
+      <div className="flex flex-col items-center md:items-start justify-center">
+        <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+        <div className="mt-2 text-3xl md:text-4xl font-extrabold tracking-wide text-sky-800">
+          SYNDAPSIS
+        </div>
+        <a
+          className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
+          href={REPOS.syndapsis}
+          target="_blank"
+          rel="noopener"
+        >
+          Open Syndapsis
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* What we do */}
       <section id="what" className="bg-white">
