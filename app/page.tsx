@@ -120,17 +120,10 @@ export default function Home(){
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card
-              title="Enterprises — TRU-e Onboarding"
-              desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
-              cta={{ label: "Onboarding Enterprise", href: REPOS.onboardingEnterprise }}
-            />
-            <Card
-              title="Agents — PTrust + Lateral interview"
-              desc="Verification + superpowers (De Bono). Compete on merit, not identity."
-              cta={{ label: "Onboarding Agents", href: REPOS.onboardingAgents }}
-            />
+          <p className="mt-2 text-slate-800 text-lg md:text-xl max-w-3xl">We connect agents with cognitive superpowers who solve complex problems for society and companies in innovative ways. Both companies and agents complete an onboarding to interact through our challenge platform, <b>Syndapsis</b>.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a className="btn-primary" href={REPOS.onboardingEnterprise} target="_blank" rel="noopener">Onboarding Enterprise</a>
+            <a className="btn-outline" href={REPOS.onboardingAgents} target="_blank" rel="noopener">Onboarding Agents</a>
           </div>
         </div>
       </section>
