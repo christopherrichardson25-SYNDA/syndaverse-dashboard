@@ -59,7 +59,7 @@ export default function Nav() {
               className={[
                 "inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition",
                 active === l.id
-                  ? "border-blue-600 text-blue-700"
+                  ? "border-blue-600 "
                   : "border-slate-300 text-slate-700 hover:bg-slate-50",
               ].join(" ")}
             >
@@ -102,7 +102,7 @@ export default function Nav() {
                     className={[
                       "block rounded-xl border px-4 py-3 text-base font-medium",
                       active === l.id
-                        ? "border-blue-600 text-blue-700"
+                        ? "border-blue-600 "
                         : "border-slate-300 text-slate-700 hover:bg-slate-50",
                     ].join(" ")}
                   >

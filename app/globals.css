@@ -15,3 +15,20 @@ button { @apply focus:outline-none focus:ring-2 focus:ring-sky-400/50; }
 .card { @apply rounded-2xl border border-[color:var(--border)] bg-white shadow-sm; }
 .btn-primary { @apply inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600; }
 .btn-outline { @apply inline-flex items-center rounded-full border border-[color:var(--border)] px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50; }
+
+/* Force white heading in hero */
+.hero h1{ @apply text-white; }
+
+
+/* Ensure white text on primary CTA (even if <a>) */
+.btn-primary, .btn-primary:link, .btn-primary:visited, .btn-primary a{ @apply text-white; }
+
+
+/* Force white text on header CTA */
+.nav-cta, .nav-cta:link, .nav-cta:visited, .nav-cta:hover { @apply text-white; }
+
+
+/* Force white text on header CTA (and its children) */
+.nav-cta, .nav-cta * { color: #fff !important; }
+/* Asegura contraste también si el CTA usa la clase utilitaria del proyecto */
+.btn-primary, .btn-primary *, .btn-primary:link, .btn-primary:visited { color: #fff !important; }
