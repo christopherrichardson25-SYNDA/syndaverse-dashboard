@@ -23,11 +23,11 @@ export default function Home(){
       <NavHeader />
 
       {/* HERO — SYNDAPSIS.png + etiqueta; solo "Find out more" */}
-      <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
+      <section className="hero relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
             <div>
-              <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl">
+              <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl text-white text-white">
                 We make the invisible visible
               </h1>
               <p className="mt-4 text-white/90 md:text-lg">
@@ -59,11 +59,11 @@ export default function Home(){
         </div>
       </section>
 
-      {/* The SYNDA Difference — 4 cards + PLUS + "=" + bridge.png */}
+      {/* The SYNDΛ Difference — 4 cards + PLUS + "=" + bridge.png */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
-            The SYNDA Difference
+            The SYNDΛ Difference
           </h2>
 
           <div className="grid items-center gap-8 md:grid-cols-3">
@@ -100,7 +100,7 @@ export default function Home(){
 
             {/* "=" nivelado + bridge debajo */}
             <div className="relative md:h-full">
-  <span aria-hidden className="absolute top-1/2 -translate-y-1/2 left-2 md:left-4 text-slate-400 text-6xl leading-none font-light">=</span>
+  <span aria-hidden className="absolute top-1/2 -translate-y-1/2 -left-8 md:-left-12 text-slate-400 text-6xl leading-none font-light pointer-events-none">=</span>
   <div className="flex h-full w-full items-center justify-center">
     <Image
       src="/bridge.png"

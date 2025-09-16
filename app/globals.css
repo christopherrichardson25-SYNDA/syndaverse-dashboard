@@ -32,3 +32,10 @@ button { @apply focus:outline-none focus:ring-2 focus:ring-sky-400/50; }
 .nav-cta, .nav-cta * { color: #fff !important; }
 /* Asegura contraste también si el CTA usa la clase utilitaria del proyecto */
 .btn-primary, .btn-primary *, .btn-primary:link, .btn-primary:visited { color: #fff !important; }
+
+/* ── Force white text for emerald CTAs (header "LET’S CHAT", etc.) ───────── */
+:where(.bg-emerald-500, .bg-emerald-600) { color:#fff !important; }
+:where(.bg-emerald-500, .bg-emerald-600) :where(*) { color:#fff !important; }
+
+/* Refuerzo para nuestras utilidades */
+.btn-primary, .btn-primary *, .btn-primary:link, .btn-primary:visited { color:#fff !important; }
