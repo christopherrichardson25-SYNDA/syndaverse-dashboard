@@ -377,3 +377,39 @@ function ListCard({ title, items }: { title: string; items: string[] }) {
     </div>
   );
 }
+function ShieldIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2l7 3v6c0 5-3.6 8.9-7 10-3.4-1.1-7-5-7-10V5l7-3Z" />
+      <path d="M10.2 12.8l-1.7-1.7-1.4 1.4 3.1 3.1 6-6-1.4-1.4-4.6 4.6Z" fill="#10B981"/>
+    </svg>
+  );
+}
+function MedalIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M8 3h8l-2.5 5H10.5L8 3Z" />
+      <circle cx="12" cy="14" r="5" />
+      <path d="M12 11.5l.9 1.9 2.1.3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2.1-.3.9-1.9Z" fill="#F59E0B"/>
+    </svg>
+  );
+}
+function NetworkIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <circle cx="6" cy="6" r="2.2" />
+      <circle cx="18" cy="6" r="2.2" />
+      <circle cx="12" cy="18" r="2.2" />
+      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none"/>
+    </svg>
+  );
+}
+function BulbIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 3a7 7 0 0 1 5.7 11.1c-.7 1-1.7 2-1.7 3.2v.7H8v-.7c0-1.2-1-2.2-1.7-3.2A7 7 0 0 1 12 3Z"/>
+      <rect x="9" y="19" width="6" height="2" rx="1" />
+      <path d="M9 22h6" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
