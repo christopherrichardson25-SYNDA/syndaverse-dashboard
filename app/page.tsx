@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, type ReactNode } from "react";
 import ManifestoModal from "../components/ManifestoModal";
 import NavHeader from "../components/NavHeader"; // <— si tu header se llama distinto, cambia esta línea
+import Link from "next/link";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -194,12 +195,14 @@ export default function Home() {
             >
               Quick TRU-e check
             </a>
-            <a
-              className="btn-outline"
-              href={REPOS.onboardingEnterprise}
-              target="_blank"
-              rel="noopener"
-            >
+           <Link
+  href="/quick-check"
+  className="btn-primary"
+>
+  Quick TRU-e check
+</Link>
+
+
               Onboarding Enterprise
             </a>
           </div>
