@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
 import ManifestoModal from "../components/ManifestoModal";
-import NavHeader from "../components/NavHeader"; // <— si tu header se llama distinto, cambia esta línea
+import NavHeader from "../components/NavHeader";
 import Link from "next/link";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
@@ -13,7 +13,7 @@ const REPOS = {
   truCalculator: `${GH}/tru-e-calculator`,
   syndapsis: `${GH}/syndapsis-platform`,
   syndatools: `${GH}/syndatools`,
-  syndapticCalculator: `${GH}/syndaptic-calculator`, // podrás crear/ajustar este repo
+  syndapticCalculator: `${GH}/syndaptic-calculator`,
 };
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
             The SYNDΛ Difference
           </h2>
 
-          <div className="grid items-center gap-8 md:grid-cols-3">
+        <div className="grid items-center gap-8 md:grid-cols-3">
             {/* 2x2 cards con PLUS centrado */}
             <div className="relative md:col-span-2 md:min-h-[360px]">
               <div className="grid gap-6 sm:grid-cols-2">
@@ -186,23 +186,21 @@ export default function Home() {
               desc="Industry benchmark vs peers and time trends to track progress."
             />
           </div>
+
+          {/* BOTONES CORREGIDOS */}
           <div className="mt-4 flex flex-wrap gap-3">
+            {/* Quick TRU-e check → ruta interna */}
+            <Link href="/quick-check" className="btn-primary">
+              Quick TRU-e check
+            </Link>
+
+            {/* Onboarding Enterprise → por ahora externo */}
             <a
-              className="btn-primary"
-              href={REPOS.truCalculator}
+              className="btn-outline"
+              href={REPOS.onboardingEnterprise}
               target="_blank"
               rel="noopener"
             >
-              Quick TRU-e check
-            </a>
-           <Link
-  href="/quick-check"
-  className="btn-primary"
->
-  Quick TRU-e check
-</Link>
-
-
               Onboarding Enterprise
             </a>
           </div>
@@ -295,11 +293,16 @@ export default function Home() {
           <h2 className="mb-2 text-xl font-semibold text-slate-900">
             Syndatools — Apps, agents & knowledge
           </h2>
-        <p className="text-slate-700">
+          <p className="text-slate-700">
             Marketplace to power companies and agents. Includes Syndabooks.
           </p>
           <div className="mt-4">
-            <a className="btn-primary" href={REPOS.syndatools} target="_blank" rel="noopener">
+            <a
+              className="btn-primary"
+              href={REPOS.syndatools}
+              target="_blank"
+              rel="noopener"
+            >
               Open Syndatools
             </a>
           </div>
@@ -309,14 +312,20 @@ export default function Home() {
       {/* Privacy */}
       <section id="privacy" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">Privacy Policy</h2>
+          <h2 className="mb-2 text-xl font-semibold text-slate-900">
+            Privacy Policy
+          </h2>
           <p className="text-slate-700">
-            Minimal data, encryption and explicit consent. Agent identities are protected; merit is evaluated.
+            Minimal data, encryption and explicit consent. Agent identities are
+            protected; merit is evaluated.
           </p>
         </div>
       </section>
 
-      <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
+      <ManifestoModal
+        open={manifestoOpen}
+        onClose={() => setManifestoOpen(false)}
+      />
     </>
   );
 }
