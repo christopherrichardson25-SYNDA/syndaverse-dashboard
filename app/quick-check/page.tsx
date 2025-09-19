@@ -9,20 +9,12 @@ const API =
 type ScoreResponse = {
   brand: string;
   industry: string;
-  score_0_100: number;
-  label: string;
-  level: string;
-  nm_numeric?: number;
-  label_combined?: string;
-  atru_0_100?: number;
-  aov_0_100?: number;
-  dao_0_100?: number;
-  coherence_0_100?: number;
+  score_0_100: number;     // IET
+  label: string;           // Banda (A..E)
+  level: string;           // NM textual (Funcional..Transformacional)
+  nm_numeric?: number;     // NM numérico 1..5
   wtp_impact_0_100?: number;
-  wtp_price_gap_abs?: number | null;
   wtp_price_gap_pct?: number | null;
-  weights_used?: Record<string, number>;
-  components?: Record<string, number>;
 };
 
 type FormState = {
@@ -65,6 +57,34 @@ const PUBLIC_DOMAINS = [
   "outlook.com","live.com","icloud.com","proton.me","protonmail.com",
   "aol.com","gmx.com"
 ];
+
+/** Texto por industria */
+function explainIndicators(industry: string, r: ScoreResponse) {
+  const IET = Math.round(r.score_0_100);
+  const NM = r.level ?? "—";
+  const WTP =
+    r.wtp_price_gap_pct ?? (typeof r.wtp_impact_0_100 === "number" ? r.wtp_impact_0_100 : null);
+
+  const base = {
+    _generic: `Tu IET es ${IET}/100: indica la fortaleza global de confianza.
+NM: ${NM}. Esto refleja la madurez de la marca (1=Funcional → 5=Transformacional).
+WTP: ${WTP ?? 0}%: prima de precio que el mercado está dispuesto a pagar cuando hay coherencia.`,
+    retail: `En retail, un IET de ${IET} se traduce en mayor repetición y ticket.
+NM: ${NM}; cuanto más arriba, más relación y propósito influyen en la elección.
+WTP estimado: ${WTP ?? 0}% puede capturarse con surtido, servicio y evidencia de promesa.`,
+    banking: `En banca, IET ${IET} correlaciona con permanencia y cross-sell.
+NM: ${NM}. Subir de nivel exige consistencia regulatoria + experiencia omnicanal.
+WTP: ${WTP ?? 0}%, generalmente visible en comisiones/paquetes premium.`,
+    telco: `En telco, IET ${IET} reduce churn. NM: ${NM}.
+WTP: ${WTP ?? 0}% suele capturarse en bundles y beneficios tangibles.`,
+    energy: `En energía, IET ${IET} impulsa adopción de planes y proyectos.
+NM: ${NM}. WTP: ${WTP ?? 0}% depende de confiabilidad, ESG y respuesta al cliente.`,
+    services: `En servicios, IET ${IET} sostiene retención y referrals.
+NM: ${NM}. WTP: ${WTP ?? 0}% se habilita demostrando valor y coherencia en la entrega.`
+  } as Record<string,string>;
+
+  return base[industry] ?? base._generic;
+}
 
 export default function QuickCheck() {
   const [used, setUsed] = useState(false);
@@ -143,7 +163,7 @@ export default function QuickCheck() {
     setSaving(true);
     setErrorMsg(null);
     try {
-      const res = await fetch(`${API}/lead`, {
+      await fetch(`${API}/lead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -154,10 +174,8 @@ export default function QuickCheck() {
           source: "quick-check",
         }),
       });
-      if (!res.ok) console.warn("Lead endpoint not available:", res.status);
       setEmailOk(true);
-    } catch (e) {
-      console.warn("Lead save error:", e);
+    } catch {
       setEmailOk(true);
     } finally {
       setSaving(false);
@@ -179,6 +197,15 @@ export default function QuickCheck() {
     "wtp_premium_pct",
   ];
 
+  // Derivar WTP a mostrar (pct) a partir de la respuesta
+  function pickWTP(r: ScoreResponse | null): number {
+    if (!r) return 0;
+    const pct = typeof r.wtp_price_gap_pct === "number" ? r.wtp_price_gap_pct : null;
+    if (pct !== null) return Math.round(pct);
+    if (typeof r.wtp_impact_0_100 === "number") return Math.round(r.wtp_impact_0_100);
+    return 0;
+  }
+
   return (
     <main className="mx-auto max-w-4xl p-6">
       <h1 className="text-2xl font-semibold">Quick TRU-e check</h1>
@@ -186,7 +213,7 @@ export default function QuickCheck() {
         Un cálculo gratuito para conocer el nivel de confianza de tu marca.
       </p>
 
-      {/* Cabecera */}
+      {/* Cabecera con Brand/Industry/SLA */}
       <div className="grid md:grid-cols-3 gap-3 mt-4">
         <div className="flex flex-col gap-1">
           <label className="text-sm text-slate-600">Brand</label>
@@ -223,7 +250,7 @@ export default function QuickCheck() {
         </div>
       </div>
 
-      {/* Numéricos */}
+      {/* Numéricos (resto) */}
       <div className="grid md:grid-cols-3 gap-3 mt-3">
         {fieldsNumber
           .filter((k) => k !== "sla")
@@ -247,7 +274,7 @@ export default function QuickCheck() {
         {loading ? "Calculando…" : used ? "Ya utilizaste tu quick check" : "Calcular"}
       </button>
 
-      {/* RESULTADOS */}
+      {/* RESULTADOS: SOLO IET, NM y WTP */}
       {result && (
         <div className="relative mt-6">
           {/* Bloqueo hasta correo corporativo */}
@@ -274,21 +301,17 @@ export default function QuickCheck() {
             </div>
           )}
 
-          {/* Vista (no seleccionable) */}
+          {/* 3 cajas + explicación */}
           <div className="select-none" onContextMenu={(e) => e.preventDefault()}>
             <Boxes
               items={[
                 ["IET", Math.round(result.score_0_100)],
-                ["Banda", result.label],
-                ["Nivel", result.level],
-                ["ATRU", Math.round(result.atru_0_100 ?? 0)],
+                ["NM", result.level],
+                ["WTP", `${pickWTP(result)}%`],
               ]}
             />
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              <Card title="AOV (objetivo)" value={Math.round(result.aov_0_100 ?? 0)} />
-              <Card title="DAO (percepción)" value={Math.round(result.dao_0_100 ?? 0)} />
-              <Card title="Coherencia" value={Math.round(result.coherence_0_100 ?? 0)} />
-              <Card title="WTP impacto" value={Math.round(result.wtp_impact_0_100 ?? 0)} />
+            <div className="mt-4 rounded-2xl border bg-slate-50 p-4 text-sm text-slate-700 whitespace-pre-line">
+              {explainIndicators(form.industry, result)}
             </div>
           </div>
         </div>
@@ -316,7 +339,7 @@ export default function QuickCheck() {
 /** ------- Presentación de cajas ------- */
 function Boxes({ items }: { items: Array<[title: string, value: string | number]> }) {
   return (
-    <div className="grid md:grid-cols-4 gap-4">
+    <div className="grid md:grid-cols-3 gap-4">
       {items.map(([title, value]) => (
         <CanvasBox key={title} title={title} value={value} />
       ))}
@@ -338,15 +361,6 @@ function CanvasBox({ title, value }: { title: string; value: string | number }) 
     <div className="rounded-2xl border p-4 bg-white shadow-sm">
       <div className="text-sm text-slate-500">{title}</div>
       <canvas width={220} height={60} aria-label={`${title}: ${value}`} ref={ref} />
-    </div>
-  );
-}
-
-function Card({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="rounded-2xl border p-4 bg-white shadow-sm">
-      <div className="text-sm text-slate-500">{title}</div>
-      <div className="mt-1 text-3xl font-bold">{value}</div>
     </div>
   );
 }
