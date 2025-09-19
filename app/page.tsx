@@ -1,11 +1,9 @@
-// app/page.tsx
 "use client";
 
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
-
-import NavHeader from "../components/NavHeader";
 import ManifestoModal from "../components/ManifestoModal";
+import NavHeader from "../components/NavHeader"; // <— si tu header se llama distinto, cambia esta línea
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -14,6 +12,7 @@ const REPOS = {
   truCalculator: `${GH}/tru-e-calculator`,
   syndapsis: `${GH}/syndapsis-platform`,
   syndatools: `${GH}/syndatools`,
+  syndapticCalculator: `${GH}/syndaptic-calculator`, // podrás crear/ajustar este repo
 };
 
 export default function Home() {
@@ -23,12 +22,12 @@ export default function Home() {
     <>
       <NavHeader />
 
-      {/* HERO – ahora muestra SYNDAPSIS.png y la etiqueta debajo */}
-      <section className="relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
+      {/* HERO */}
+      <section className="hero relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
         <div className="container mx-auto max-w-6xl px-4 py-14">
           <div className="grid items-center gap-8 md:grid-cols-2">
             <div>
-              <h1 className="mt-0 text-3xl font-bold leading-tight md:text-5xl">
+              <h1 className="mt-0 text-3xl font-bold leading-tight text-white md:text-5xl">
                 We make the invisible visible
               </h1>
               <p className="mt-4 text-white/90 md:text-lg">
@@ -39,18 +38,17 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   type="button"
+                  className="btn-primary"
                   onClick={() => setManifestoOpen(true)}
-                  className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
                 >
                   Find out more
                 </button>
-                {/* (Se quitó el botón de TRU-e calculator del hero) */}
               </div>
             </div>
 
-            {/* Visual derecho: SYNDAPSIS.png con etiqueta */}
+            {/* Visual SYNDAPSIS */}
             <div className="relative">
-              <div className="rounded-2xl bg-white p-4 shadow-xl ring-1 ring-slate-200 text-center">
+              <div className="card p-4 text-center shadow-md">
                 <SyndapsisLogo className="mx-auto h-auto w-64 md:w-72" />
                 <div className="mt-3 text-2xl font-extrabold tracking-wide text-sky-800">
                   SYNDAPSIS
@@ -61,16 +59,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The SYNDA Difference – 4 cards + PLUS + “= bridge.png” nivelado */}
+      {/* The SYNDΛ Difference */}
       <section id="difference" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-3xl font-semibold leading-tight text-slate-900">
-            The SYNDA Difference
+            The SYNDΛ Difference
           </h2>
 
           <div className="grid items-center gap-8 md:grid-cols-3">
-            {/* 2x2 grid con PLUS centrado */}
-            <div className="relative md:col-span-2">
+            {/* 2x2 cards con PLUS centrado */}
+            <div className="relative md:col-span-2 md:min-h-[360px]">
               <div className="grid gap-6 sm:grid-cols-2">
                 <DiffCard
                   icon={<ShieldIcon />}
@@ -94,25 +92,32 @@ export default function Home() {
                 />
               </div>
 
-              {/* PLUS (centrado absoluto) */}
+              {/* PLUS centrado */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 select-none sm:block"
               >
-                <span className="text-amber-400 text-5xl md:text-6xl font-black">+</span>
+                <span className="z-10 text-amber-400 text-5xl font-black md:text-6xl">
+                  +
+                </span>
               </div>
             </div>
 
-            {/* Columna derecha: símbolo “=” nivelado + bridge.png debajo */}
-            <div className="grid h-full place-items-center">
-              <div className="flex flex-col items-center">
-                <div className="text-slate-400 text-6xl leading-none font-light">=</div>
+            {/* '=' alineado con el '+' y separado de la imagen */}
+            <div className="relative md:h-full md:min-h-[360px]">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 -translate-y-1/2 -left-12 md:-left-16 text-slate-400 text-4xl font-light leading-none md:text-6xl"
+              >
+                =
+              </span>
+              <div className="flex h-full w-full items-center justify-center">
                 <Image
                   src="/bridge.png"
                   alt="Bridge: from the invisible to the visible"
                   width={280}
                   height={160}
-                  className="mt-3 h-auto w-56 md:w-64"
+                  className="ml-10 h-auto w-56 md:ml-12 md:w-64"
                   priority
                 />
               </div>
@@ -121,46 +126,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What we do */}
+      {/* What we do (simple) */}
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card
-              title="Enterprises — TRU-e Onboarding"
-              desc="Brand Level, IET and WTP↔Price Gap to define priorities and the brief."
-              cta={{ label: "Onboarding Enterprise", href: REPOS.onboardingEnterprise }}
-            />
-            <Card
-              title="Agents — PTrust + Lateral interview"
-              desc="Verification + superpowers (De Bono). Compete on merit, not identity."
-              cta={{ label: "Onboarding Agents", href: REPOS.onboardingAgents }}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How we do it — Syndapsis (si ya tienes un componente, puedes sustituir esta sección por <HowWeDoIt />) */}
-      <section id="how" className="bg-white">
-        <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">How we do it — Syndapsis</h2>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
-            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
-            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
-            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
-          </div>
-          <div className="mt-4 flex flex-wrap gap-3">
+          <p className="mt-2 max-w-3xl text-lg text-slate-800 md:text-xl">
+            We connect agents with <b>cognitive superpowers</b> who solve complex
+            problems for society and companies in innovative ways. Both companies
+            and agents complete an onboarding to interact through our challenge
+            platform, <b>Syndapsis</b>.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
             <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndapsis}
+              className="btn-primary"
+              href={REPOS.onboardingEnterprise}
               target="_blank"
               rel="noopener"
             >
-              Open Syndapsis
+              Onboarding Enterprise
             </a>
             <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
+              className="btn-outline"
               href={REPOS.onboardingAgents}
               target="_blank"
               rel="noopener"
@@ -171,52 +157,130 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TRU-e calculator */}
-      <section id="calculator" className="bg-white">
+      {/* How we do it — Enterprise */}
+      <section id="how-enterprise" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">TRU-e calculator</h2>
-          <p className="text-slate-700">Try the TRU-e method and get a quick motivational result.</p>
+          <h2 className="mb-3 text-xl font-semibold text-slate-900">
+            How we do it — Enterprise
+          </h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            <Step
+              n="1"
+              title="Onboarding"
+              desc="Company profile, goals and context. Access for key stakeholders."
+            />
+            <Step
+              n="2"
+              title="TRU-e Evaluation"
+              desc="Trust diagnostic: Pyramid level, Total Trust, and WTP↔Price Gap (IET/coherence)."
+            />
+            <Step
+              n="3"
+              title="Results"
+              desc="Insights & priorities from TRU-e; measurable targets and challenge brief."
+            />
+            <Step
+              n="4"
+              title="Benchmark"
+              desc="Industry benchmark vs peers and time trends to track progress."
+            />
+          </div>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
+              className="btn-primary"
               href={REPOS.truCalculator}
               target="_blank"
               rel="noopener"
             >
-              Open TRU-e Calculator
+              Quick TRU-e check
             </a>
             <a
-              className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-white"
+              className="btn-outline"
               href={REPOS.onboardingEnterprise}
               target="_blank"
               rel="noopener"
             >
-              Start TRU-e
+              Onboarding Enterprise
             </a>
           </div>
         </div>
       </section>
 
-      {/* Who we are */}
-      <section id="who" className="bg-white">
+      {/* How we do it — Agents */}
+      <section id="how-agents" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-3 text-xl font-semibold text-slate-900">Who we are — SYNDA</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            <ListCard
-              title="Values"
-              items={[
-                "Merit and evidence (TRU-e / PTrust)",
-                "Privacy and respect for neurodiversity",
-                "Transparent criteria (AHP) and outcomes",
-              ]}
+          <h2 className="mb-3 text-xl font-semibold text-slate-900">
+            How we do it — Agents
+          </h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            <Step
+              n="1"
+              title="Onboarding"
+              desc="Anonymous sign-up and PTrust verification."
             />
-            <ListCard
-              title="Different from traditional inclusive hiring"
-              items={[
-                "We don't place jobs — we solve problems",
-                "Match by superpowers, not by CV",
-                "Reward for outcomes; reputation for trust",
-              ]}
+            <Step
+              n="2"
+              title="Syndaptic Evaluation"
+              desc="Quick cognitive check + lateral interview (De Bono) to map superpowers."
+            />
+            <Step
+              n="3"
+              title="Avatar Creation"
+              desc="Public avatar with trust badge and 6-dimension superpower profile (0–100)."
+            />
+            <Step
+              n="4"
+              title="Training"
+              desc="Micro-trainings & tools to strengthen weak dimensions; ready for challenges."
+            />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              className="btn-primary"
+              href={REPOS.syndapticCalculator}
+              target="_blank"
+              rel="noopener"
+            >
+              Quick SYNDAPTIC check
+            </a>
+            <a
+              className="btn-outline"
+              href={REPOS.onboardingAgents}
+              target="_blank"
+              rel="noopener"
+            >
+              Onboarding Agents
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* How we do it — Syndapsis */}
+      <section id="how" className="bg-white">
+        <div className="container mx-auto max-w-6xl px-4 py-12">
+          <h2 className="mb-3 text-xl font-semibold text-slate-900">
+            How we do it — Syndapsis
+          </h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            <Step
+              n="1"
+              title="Brief & Reward"
+              desc="Publish the challenge with reward and timeline."
+            />
+            <Step
+              n="2"
+              title="AHP Weights"
+              desc="Questionnaire by De Bono hats to define the match."
+            />
+            <Step
+              n="3"
+              title="Ranking & Selection"
+              desc="Agents prioritized by AHP; winners are chosen."
+            />
+            <Step
+              n="4"
+              title="Delivery & Evidence"
+              desc="Validation and learning captured for TRU-e/IET."
             />
           </div>
         </div>
@@ -228,16 +292,11 @@ export default function Home() {
           <h2 className="mb-2 text-xl font-semibold text-slate-900">
             Syndatools — Apps, agents & knowledge
           </h2>
-          <p className="text-slate-700">
+        <p className="text-slate-700">
             Marketplace to power companies and agents. Includes Syndabooks.
           </p>
           <div className="mt-4">
-            <a
-              className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600"
-              href={REPOS.syndatools}
-              target="_blank"
-              rel="noopener"
-            >
+            <a className="btn-primary" href={REPOS.syndatools} target="_blank" rel="noopener">
               Open Syndatools
             </a>
           </div>
@@ -254,16 +313,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Manifesto modal */}
       <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
     </>
   );
 }
 
-/* ───────── Helpers & Subcomponents ───────── */
+/* ===== Helpers & icons ===== */
 
 function SyndapsisLogo({ className }: { className?: string }) {
-  // Fallback por diferencias de mayúsculas en /public
+  // Fallback por si la imagen tiene otra capitalización en /public
   const candidates = ["/SYNDAPSIS.png", "/Syndapsis.png", "/syndapsis.png"];
   const [idx, setIdx] = useState(0);
   return (
@@ -279,9 +337,17 @@ function SyndapsisLogo({ className }: { className?: string }) {
   );
 }
 
-function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text: string }) {
+function DiffCard({
+  icon,
+  title,
+  text,
+}: {
+  icon: ReactNode;
+  title: string;
+  text: string;
+}) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="card p-6">
       <div className="flex flex-col items-center text-center md:items-start md:text-left">
         <div className="mb-4 grid h-16 w-16 place-items-center rounded-xl bg-sky-50 text-sky-700">
           {icon}
@@ -293,7 +359,6 @@ function DiffCard({ icon, title, text }: { icon: ReactNode; title: string; text:
   );
 }
 
-/* Íconos */
 function ShieldIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -317,7 +382,12 @@ function NetworkIcon() {
       <circle cx="6" cy="6" r="2.2" />
       <circle cx="18" cy="6" r="2.2" />
       <circle cx="12" cy="18" r="2.2" />
-      <path d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6" stroke="currentColor" strokeWidth="1.8" fill="none" />
+      <path
+        d="M7.8 7.2 10.6 16M16.2 7.2 13.4 16M8.2 6h7.6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        fill="none"
+      />
     </svg>
   );
 }
@@ -331,34 +401,9 @@ function BulbIcon() {
   );
 }
 
-function Card({
-  title,
-  desc,
-  cta,
-}: {
-  title: string;
-  desc: string;
-  cta: { label: string; href: string };
-}) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-slate-700">{desc}</p>
-      <a
-        className="mt-3 inline-flex items-center rounded-full border border-slate-300 px-4 py-2 font-semibold text-slate-700 hover:bg-slate-50"
-        href={cta.href}
-        target="_blank"
-        rel="noopener"
-      >
-        {cta.label}
-      </a>
-    </div>
-  );
-}
-
 function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="card p-5">
       <div className="flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-100 font-bold text-slate-800">
           {n}
@@ -366,19 +411,6 @@ function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
         <h3 className="font-semibold text-slate-900">{title}</h3>
       </div>
       <p className="mt-1 text-slate-700">{desc}</p>
-    </div>
-  );
-}
-
-function ListCard({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h3 className="font-semibold text-slate-900">{title}</h3>
-      <ul className="mt-2 list-disc pl-5 text-slate-700">
-        {items.map((it) => (
-          <li key={it}>{it}</li>
-        ))}
-      </ul>
     </div>
   );
 }
