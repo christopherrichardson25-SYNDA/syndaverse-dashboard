@@ -10,7 +10,6 @@ const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
   onboardingEnterprise: `${GH}/onboarding-enterprises`,
   onboardingAgents: `${GH}/onboarding-agents`,
-  truCalculator: `${GH}/tru-e-calculator`,
   syndapsis: `${GH}/syndapsis-platform`,
   syndatools: `${GH}/syndatools`,
   syndapticCalculator: `${GH}/syndaptic-calculator`,
