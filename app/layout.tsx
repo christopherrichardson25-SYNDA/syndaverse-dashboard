@@ -1,5 +1,5 @@
 // app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
-  themeColor: "#0B0F19",
+  // ❌ themeColor ya no va aquí (Next 15 lo deprecó en metadata)
   openGraph: {
     type: "website",
     locale: "es_CL",
@@ -59,13 +59,21 @@ export const metadata: Metadata = {
   },
 };
 
+// ✅ Ahora themeColor va acá
+export const viewport: Viewport = {
+  themeColor: "#0B0F19",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="h-full" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-full bg-[#0B0F19] text-slate-100 antialiased`}
       >
-        <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:m-4 focus:rounded focus:bg-white/10 focus:px-3 focus:py-2">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:m-4 focus:rounded focus:bg-white/10 focus:px-3 focus:py-2"
+        >
           Saltar al contenido
         </a>
 
