@@ -2,220 +2,149 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const API =
-  process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
+const API = process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
 
-/** ===== Tipos mínimos que esperamos del backend ===== */
+/** ===== Tipos de respuesta del backend ===== */
 type ScoreResponse = {
   brand: string;
   industry: string;
-  score_0_100: number;         // IET base
-  label?: string;              // p.ej. "B"
-  level?: string;              // p.ej. "Relacional"  (usado para NM)
-  // Campos opcionales: intentamos derivar WTP de cualquiera de estos
-  wtp_impact_0_100?: number;
-  wtp_price_gap_pct?: number | null;
-  wtp_price_gap_abs?: number | null;
-  components?: Record<string, number>;
+  score_0_100: number; // IET
+  label?: string;      // letra (B, C...)
+  level?: string;      // texto (Relacional, etc.)
+  wtp_impact_0_100?: number; // impacto de WTP si viene
 };
 
-const INDUSTRIES = [
-  "_generic",
-  "retail",
-  "cp_grocery",
-  "telco",
-  "banking",
-  "insurance",
-  "mobility",
-] as const;
+/** ===== Helpers ===== */
+const isFreeEmail = (email: string) =>
+  /(gmail|outlook|hotmail|yahoo|icloud|protonmail)\./i.test(email);
 
-const FREE_MAIL = [
-  "gmail.com",
-  "hotmail.com",
-  "outlook.com",
-  "live.com",
-  "yahoo.com",
-  "icloud.com",
-  "proton.me",
-  "protonmail.com",
-];
+const levelFrom = (r: ScoreResponse) => r.level || r.label || "—";
+const wtpFrom = (r: ScoreResponse) =>
+  typeof r.wtp_impact_0_100 === "number" ? Math.round(r.wtp_impact_0_100) : 0;
 
+/** ===== Página ===== */
 export default function QuickCheck() {
-  /** ======= UI state ======= */
+  // Form
   const [brand, setBrand] = useState("");
-  const [industry, setIndustry] = useState<(typeof INDUSTRIES)[number]>("_generic");
+  const [industry, setIndustry] = useState("_generic");
+
+  // Paso 1 → calcular
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [score, setScore] = useState<ScoreResponse | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const [result, setResult] = useState<ScoreResponse | null>(null);
-
-  // “Gate” de correo corporativo
+  // Paso 2 → gate por correo corporativo
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [leadSaving, setLeadSaving] = useState(false);
-  const [leadSaved, setLeadSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
-  /** ======= Helpers ======= */
-  const nm = useMemo(() => result?.level ?? result?.label ?? "-", [result]);
-
-  // WTP: tomamos la mejor señal disponible del backend
-  const wtp = useMemo(() => {
-    if (!result) return null;
-
-    // 1) Si backend entrega wtp_impact_0_100 (0..100), lo normalizamos a “%”
-    if (typeof result.wtp_impact_0_100 === "number") {
-      return Math.round(result.wtp_impact_0_100);
+  // 1 uso por navegador (solo para el cálculo)
+  useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("truq_used") === "1") {
+      // permitimos recalcular, pero la UI no lo bloquea duro (tu decides)
     }
-    // 2) Si entrega wtp_price_gap_pct (positivo=permite cobrar +%)
-    if (typeof result.wtp_price_gap_pct === "number") {
-      return Math.round(result.wtp_price_gap_pct);
-    }
-    // 3) Si viene como componente “wtp” dentro de components
-    if (result.components && typeof result.components["wtp"] === "number") {
-      return Math.round(result.components["wtp"]);
-    }
-    return null;
-  }, [result]);
-
-  const iet = useMemo(
-    () => (result ? Math.round(result.score_0_100) : null),
-    [result]
-  );
-
-  // Texto explicativo según industria (breve y genérico)
-  const explainer = useMemo(() => {
-    const base =
-      "Indicadores TRU-e: IET (confianza total), NM (nivel de marca en la pirámide) y WTP (disposición a pagar).";
-    const byIndustry: Record<string, string> = {
-      _generic:
-        "Valores de referencia generales; interpreta las brechas y prioridades para tu categoría.",
-      retail:
-        "En retail, la experiencia (SLA, quejas, satisfacción) y coherencia de promesa-percepción mueven mucho el IET. WTP suele concentrarse en surtido, precio percibido y servicio.",
-      cp_grocery:
-        "En consumo masivo, consistencia de calidad, reputación digital y disponibilidad inciden fuerte en IET; WTP se gana con innovación y claridad de valor.",
-      telco:
-        "En telco, SLA y resolución de quejas son críticos para IET; WTP mejora con transparencia y mejora percibida del plan/beneficios.",
-      banking:
-        "En banca, confianza transaccional y trato justo pesan en IET; WTP se apoya en asesoría, beneficios y seguridad percibida.",
-      insurance:
-        "En seguros, claridad de cobertura, facilidad de siniestros y reputación mueven IET; WTP mejora con acompañamiento y valor tangible.",
-      mobility:
-        "En movilidad, puntualidad, seguridad y servicio postventa sostienen IET; WTP depende de confort, eficiencia y beneficios visibles.",
-    };
-    return `${base} ${byIndustry[industry] ?? byIndustry._generic}`;
-  }, [industry]);
-
-  /** ======= Actions ======= */
+  }, []);
 
   async function onCalc() {
-    setErr(null);
-    setResult(null);
-
+    setErrorMsg("");
     if (!brand.trim()) {
-      setErr("Ingresa una marca.");
+      setErrorMsg("Ingresa la marca.");
       return;
     }
-
     setLoading(true);
     try {
+      const payload = {
+        industry,
+        brand: brand.trim(),
+        weights_mode: "auto_heuristic",
+        data: {
+          // valores default mínimos para obtener un IET/NM/WTP coherentes
+          sla: 70,
+          complaints_rate: 30,
+          productivity_per_labor_hour: 60,
+          caov: 55,
+          esg: 58,
+          governance: 62,
+          nps: 10,
+          satisfaction: 72,
+          digital_rep: 65,
+          brand_promise: 70,
+          brand_perception: 66,
+          wtp_premium_pct: 0
+        },
+      };
+
       const r = await fetch(`${API}/score`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          industry,
-          brand,
-          weights_mode: "auto_heuristic",
-          // Datos mínimos por si el backend los requiere (defaults razonables)
-          data: {
-            sla: 70,
-            complaints_rate: 30,
-            productivity_per_labor_hour: 60,
-            caov: 55,
-            esg: 58,
-            governance: 62,
-            nps: 10,
-            satisfaction: 72,
-            digital_rep: 65,
-            brand_promise: 70,
-            brand_perception: 66,
-            wtp_premium_pct: 0,
-          },
-        }),
+        body: JSON.stringify(payload),
       });
-
-      if (!r.ok) {
-        const txt = await r.text();
-        throw new Error(`Backend ${r.status}: ${txt || "error"}`);
-      }
-
+      if (!r.ok) throw new Error(`API /score ${r.status}`);
       const json: ScoreResponse = await r.json();
-      setResult(json);
-      setLeadSaved(false);
+      setScore(json);
+      if (typeof window !== "undefined") localStorage.setItem("truq_used", "1");
+      // al calcular, aún NO mostramos; pedimos correo corporativo
+      setUnlocked(false);
     } catch (e: any) {
-      setErr(e?.message ?? "No pudimos calcular. Intenta de nuevo.");
+      setErrorMsg("No pudimos calcular. Revisa el backend o intenta de nuevo.");
     } finally {
       setLoading(false);
     }
   }
 
-  function validateCorporateEmail(v: string) {
-    const m = v.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return "Ingresa un correo válido.";
-    const domain = m.split("@")[1] || "";
-    if (FREE_MAIL.includes(domain)) {
-      return "Usa un correo corporativo (no Gmail/Outlook/etc.).";
+  async function onUnlock() {
+    setErrorMsg("");
+    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+      setErrorMsg("Escribe un correo válido.");
+      return;
     }
-    return null;
-  }
+    if (isFreeEmail(email)) {
+      setErrorMsg("Usa un correo corporativo (no Gmail/Outlook/etc.).");
+      return;
+    }
+    if (!score) return;
 
-  async function onSaveLead() {
-    const err = validateCorporateEmail(email);
-    setEmailError(err);
-    if (err || !result) return;
-
-    setLeadSaving(true);
+    setSaving(true);
     try {
-      const r = await fetch(`${API}/lead`, {
+      const snapshot = {
+        iet: Math.round(score.score_0_100 || 0),
+        nm: levelFrom(score),
+        wtp: wtpFrom(score),
+      };
+
+      await fetch(`${API}/lead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          brand: result.brand ?? brand,
-          industry: result.industry ?? industry,
-          snapshot: {
-            iet,
-            nm,
-            wtp,
-          },
+          brand,
+          industry,
+          snapshot,
           source: "quick-check",
         }),
-      });
+      }).catch(() => { /* si /lead no está, igual desbloqueamos */ });
 
-      if (!r.ok) {
-        const t = await r.text();
-        throw new Error(`Lead ${r.status}: ${t}`);
-      }
-      setLeadSaved(true);
-    } catch (e: any) {
-      setEmailError(e?.message ?? "No pudimos guardar el correo.");
+      setUnlocked(true);
+    } catch {
+      // incluso con error de /lead dejamos ver, pero avisamos
+      setUnlocked(true);
     } finally {
-      setLeadSaving(false);
+      setSaving(false);
     }
   }
 
-  /** ======= Render ======= */
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold">Quick TRU-e check</h1>
       <p className="text-slate-600">3 indicadores rápidos: IET, NM y WTP.</p>
 
-      {/* Formulario mínimo */}
-      <div className="mt-5 grid gap-3">
+      {/* FORM */}
+      <div className="mt-4 grid gap-3">
         <div>
           <label className="text-sm text-slate-600">Brand</label>
           <input
-            className="input mt-1 w-full"
-            placeholder="p.ej, Acme Corp"
+            className="input w-full"
+            placeholder="Ej. Acme Corp"
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
           />
@@ -224,62 +153,62 @@ export default function QuickCheck() {
         <div>
           <label className="text-sm text-slate-600">Industry</label>
           <select
-            className="input mt-1 w-full"
+            className="input w-full"
             value={industry}
-            onChange={(e) => setIndustry(e.target.value as any)}
+            onChange={(e) => setIndustry(e.target.value)}
           >
-            {INDUSTRIES.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
+            <option value="_generic">_generic</option>
+            <option value="banking">banking</option>
+            <option value="retail">retail</option>
+            <option value="telco">telco</option>
           </select>
         </div>
 
-        <button onClick={onCalc} className="btn mt-2" disabled={loading}>
+        <button onClick={onCalc} className="btn w-fit" disabled={loading}>
           {loading ? "Calculando…" : "Calcular"}
         </button>
 
-        {err && <p className="text-sm text-red-600">{err}</p>}
+        {errorMsg && <div className="text-red-600 text-sm">{errorMsg}</div>}
       </div>
 
-      {/* Gate de correo corporativo para ver resultados */}
-      {result && !leadSaved && (
-        <div className="mt-6 rounded-xl border bg-slate-50 p-4">
-          <p className="text-sm text-slate-700">
+      {/* GATE DE CORREO */}
+      {score && !unlocked && (
+        <div className="mt-6 p-4 rounded-xl bg-slate-50 border">
+          <p className="text-sm text-slate-600">
             Para ver los resultados, deja tu <b>correo corporativo</b>.
           </p>
           <div className="mt-2 flex gap-2">
             <input
               type="email"
-              className="input flex-1"
               placeholder="tu@empresa.com"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError(null);
-              }}
-              onBlur={() => setEmailError(validateCorporateEmail(email))}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input flex-1"
             />
-            <button className="btn" onClick={onSaveLead} disabled={leadSaving}>
-              {leadSaving ? "Guardando…" : "Ver resultados"}
+            <button onClick={onUnlock} className="btn" disabled={saving}>
+              {saving ? "Guardando…" : "Ver resultados"}
             </button>
           </div>
-          {emailError && <p className="mt-1 text-sm text-red-600">{emailError}</p>}
         </div>
       )}
 
-      {/* Resultados (solo tras correo) */}
-      {result && leadSaved && (
+      {/* RESULTADOS: SOLO IET / NM / WTP */}
+      {score && unlocked && (
         <div className="mt-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Metric title="IET" value={iet ?? "-"} />
-            <Metric title="NM" value={nm ?? "-"} />
-            <Metric title="WTP (%)" value={wtp ?? "-"} />
+            <KPI title="IET" value={Math.round(score.score_0_100)} />
+            <KPI title="NM" value={levelFrom(score)} />
+            <KPI title="WTP" value={wtpFrom(score)} />
           </div>
 
-          <div className="mt-5 rounded-xl border p-4">
-            <p className="text-slate-700 text-sm">{explainer}</p>
+          <div className="mt-4 p-4 rounded-xl bg-white border shadow-sm">
+            <h3 className="font-semibold mb-1">¿Qué significa en tu industria?</h3>
+            <p className="text-sm text-slate-700">
+              <b>IET</b> resume el índice de confianza (0–100). <b>NM</b> ubica la marca
+              en la pirámide (ej. “Relacional”). <b>WTP</b> indica disposición a pagar/impacto
+              estimado. Para <code>{industry}</code>, estos valores sirven de punto de partida
+              para priorizar mejoras y definir el brief del desafío.
+            </p>
           </div>
         </div>
       )}
@@ -287,9 +216,8 @@ export default function QuickCheck() {
       <style jsx>{`
         .input {
           border: 1px solid #e5e7eb;
-          padding: 10px 12px;
+          padding: 10px;
           border-radius: 12px;
-          background: #fff;
         }
         .btn {
           background: #0b2742;
@@ -302,11 +230,12 @@ export default function QuickCheck() {
   );
 }
 
-function Metric({ title, value }: { title: string; value: string | number }) {
+/** ------- Componente simple de KPI ------- */
+function KPI({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="rounded-2xl border p-4 bg-white shadow-sm">
       <div className="text-sm text-slate-500">{title}</div>
-      <div className="mt-1 text-3xl font-extrabold">{value}</div>
+      <div className="text-3xl font-bold mt-1">{String(value)}</div>
     </div>
   );
 }
