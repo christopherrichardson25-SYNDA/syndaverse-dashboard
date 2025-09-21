@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-const API = process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
+const API =
+  process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
 
 /** ===== Tipos de respuesta del backend ===== */
 type ScoreResponse = {
   brand: string;
   industry: string;
   score_0_100: number; // IET
-  label?: string;      // letra (B, C...)
-  level?: string;      // texto (Relacional, etc.)
+  label?: string; // letra (B, C...)
+  level?: string; // texto (Relacional, etc.)
   wtp_impact_0_100?: number; // impacto de WTP si viene
 };
 
@@ -40,18 +41,25 @@ export default function QuickCheck() {
 
   // 1 uso por navegador (solo para el cálculo)
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("truq_used") === "1") {
-      // permitimos recalcular, pero la UI no lo bloquea duro (tu decides)
+    if (
+      typeof window !== "undefined" &&
+      localStorage.getItem("truq_used") === "1"
+    ) {
+      // permitimos recalcular; no bloqueamos duro
     }
   }, []);
 
   async function onCalc() {
     setErrorMsg("");
+    setScore(null);
+    setUnlocked(false);
+
     if (!brand.trim()) {
       setErrorMsg("Ingresa la marca.");
       return;
     }
     setLoading(true);
+
     try {
       const payload = {
         industry,
@@ -70,23 +78,37 @@ export default function QuickCheck() {
           digital_rep: 65,
           brand_promise: 70,
           brand_perception: 66,
-          wtp_premium_pct: 0
+          wtp_premium_pct: 0,
         },
       };
+
+      // 🔎 DEBUG: mostrar qué API se usa y el payload
+      console.log("DEBUG API =", API);
+      console.log("POST /score payload =", payload);
 
       const r = await fetch(`${API}/score`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!r.ok) throw new Error(`API /score ${r.status}`);
+
+      if (!r.ok) {
+        const txt = await safeText(r);
+        console.error("POST /score FAIL", r.status, r.statusText, txt);
+        throw new Error(`HTTP ${r.status}`);
+      }
+
       const json: ScoreResponse = await r.json();
+      console.log("POST /score OK", json);
+
       setScore(json);
       if (typeof window !== "undefined") localStorage.setItem("truq_used", "1");
       // al calcular, aún NO mostramos; pedimos correo corporativo
       setUnlocked(false);
     } catch (e: any) {
-      setErrorMsg("No pudimos calcular. Revisa el backend o intenta de nuevo.");
+      setErrorMsg(
+        "No pudimos calcular. Revisa el backend o intenta de nuevo."
+      );
     } finally {
       setLoading(false);
     }
@@ -112,17 +134,32 @@ export default function QuickCheck() {
         wtp: wtpFrom(score),
       };
 
-      await fetch(`${API}/lead`, {
+      // 🔎 DEBUG lead
+      const leadBody = {
+        email,
+        brand,
+        industry,
+        snapshot,
+        source: "quick-check",
+      };
+      console.log("POST /lead payload =", leadBody);
+
+      // si /lead falla, no bloqueamos
+      const rr = await fetch(`${API}/lead`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          brand,
-          industry,
-          snapshot,
-          source: "quick-check",
-        }),
-      }).catch(() => { /* si /lead no está, igual desbloqueamos */ });
+        body: JSON.stringify(leadBody),
+      }).catch((err) => {
+        console.warn("POST /lead network error (ignorado)", err);
+        return undefined as any;
+      });
+
+      if (rr && !rr.ok) {
+        const t = await safeText(rr);
+        console.warn("POST /lead FAIL (ignorado)", rr.status, rr.statusText, t);
+      } else {
+        console.log("POST /lead OK (o ignorado si no existe)");
+      }
 
       setUnlocked(true);
     } catch {
@@ -136,7 +173,10 @@ export default function QuickCheck() {
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold">Quick TRU-e check</h1>
-      <p className="text-slate-600">3 indicadores rápidos: IET, NM y WTP.</p>
+      {/* 🔎 Línea visible de depuración para confirmar la URL en uso */}
+      <p className="text-xs text-slate-500 mt-1">API: {API}</p>
+
+      <p className="text-slate-600 mt-2">3 indicadores rápidos: IET, NM y WTP.</p>
 
       {/* FORM */}
       <div className="mt-4 grid gap-3">
@@ -152,7 +192,7 @@ export default function QuickCheck() {
 
         <div>
           <label className="text-sm text-slate-600">Industry</label>
-          <select
+        <select
             className="input w-full"
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
@@ -204,10 +244,11 @@ export default function QuickCheck() {
           <div className="mt-4 p-4 rounded-xl bg-white border shadow-sm">
             <h3 className="font-semibold mb-1">¿Qué significa en tu industria?</h3>
             <p className="text-sm text-slate-700">
-              <b>IET</b> resume el índice de confianza (0–100). <b>NM</b> ubica la marca
-              en la pirámide (ej. “Relacional”). <b>WTP</b> indica disposición a pagar/impacto
-              estimado. Para <code>{industry}</code>, estos valores sirven de punto de partida
-              para priorizar mejoras y definir el brief del desafío.
+              <b>IET</b> resume el índice de confianza (0–100). <b>NM</b> ubica la
+              marca en la pirámide (ej. “Relacional”). <b>WTP</b> indica disposición
+              a pagar/impacto estimado. Para <code>{industry}</code>, estos valores
+              sirven de punto de partida para priorizar mejoras y definir el brief del
+              desafío.
             </p>
           </div>
         </div>
@@ -238,4 +279,13 @@ function KPI({ title, value }: { title: string; value: string | number }) {
       <div className="text-3xl font-bold mt-1">{String(value)}</div>
     </div>
   );
+}
+
+/** util: intenta leer texto de respuesta sin romper si no hay body */
+async function safeText(r: Response) {
+  try {
+    return await r.text();
+  } catch {
+    return "";
+  }
 }
