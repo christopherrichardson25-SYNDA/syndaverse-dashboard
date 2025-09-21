@@ -20,36 +20,47 @@ const levelFrom = (r: ScoreResponse) => r.level || r.label || "—";
 const wtpFrom = (r: ScoreResponse) =>
   typeof r.wtp_impact_0_100 === "number" ? Math.round(r.wtp_impact_0_100) : 0;
 
-// very simple “free email” filter
+// --- Corporate email gate helpers ---
 const FREE_DOMAINS = new Set([
-  'gmail.com','googlemail.com',
-  'outlook.com','hotmail.com','live.com','msn.com',
-  'yahoo.com','ymail.com',
-  'icloud.com','me.com','mac.com',
-  'proton.me','protonmail.com',
-  'aol.com','zoho.com','gmx.com','mail.com',
-  'yandex.com','yandex.ru'
+  "gmail.com",
+  "googlemail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "msn.com",
+  "yahoo.com",
+  "ymail.com",
+  "icloud.com",
+  "me.com",
+  "mac.com",
+  "proton.me",
+  "protonmail.com",
+  "aol.com",
+  "zoho.com",
+  "gmx.com",
+  "mail.com",
+  "yandex.com",
+  "yandex.ru",
 ]);
 
 const extractDomain = (email: string) => {
-  const at = email.lastIndexOf('@');
-  if (at < 0) return '';
+  const at = email.lastIndexOf("@");
+  if (at < 0) return "";
   return email.slice(at + 1).toLowerCase().trim();
 };
 
 const isCorporateEmail = (email: string) => {
-  // formato básico
+  // basic format
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
   const domain = extractDomain(email);
-  if (!domain.includes('.')) return false;
+  if (!domain.includes(".")) return false;
 
-  // bloquear “free” incluyendo subdominios: foo.gmail.com → gmail.com
-  const base = domain.split('.').slice(-2).join('.');
+  // block free providers incl. subdomains: foo.gmail.com -> gmail.com
+  const base = domain.split(".").slice(-2).join(".");
   if (FREE_DOMAINS.has(domain) || FREE_DOMAINS.has(base)) return false;
 
   return true;
 };
-
 
 export default function QuickCheck() {
   // form
@@ -106,7 +117,7 @@ export default function QuickCheck() {
       if (!r.ok) throw new Error(`API /score ${r.status}`);
       const json: ScoreResponse = await r.json();
       setScore(json);
-      // we require email next
+      // now require email to unlock
       setUnlocked(false);
     } catch {
       setScore(null);
@@ -116,45 +127,26 @@ export default function QuickCheck() {
     }
   }
 
-async function onUnlock() {
-  setErrorMsg("");
+  async function onUnlock() {
+    setErrorMsg("");
 
-  if (!email) {
-    setErrorMsg("Enter a valid email.");
-    return;
-  }
-  if (!isCorporateEmail(email)) {
-    setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
-    return;
-  }
-  if (!score) return;
+    if (!email) {
+      setErrorMsg("Enter a valid email.");
+      return;
+    }
+    if (!isCorporateEmail(email)) {
+      setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
+      return;
+    }
+    if (!score) return;
 
-  setSaving(true);
-  try {
-    const snapshot = {
-      iet: Math.round(score.score_0_100 || 0),
-      nm: levelFrom(score),
-      wtp: wtpFrom(score),
-    };
-
-    await fetch(`${API}/lead`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        brand,
-        industry,
-        snapshot,
-        source: "quick-check",
-      }),
-    }).catch(() => {});
-    setUnlocked(true);
-  } catch {
-    setUnlocked(true);
-  } finally {
-    setSaving(false);
-  }
-};
+    setSaving(true);
+    try {
+      const snapshot = {
+        iet: Math.round(score.score_0_100 || 0),
+        nm: levelFrom(score),
+        wtp: wtpFrom(score),
+      };
 
       // save lead (don’t block viewing if it fails)
       await fetch(`${API}/lead`, {
@@ -168,8 +160,10 @@ async function onUnlock() {
           source: "quick-check",
         }),
       }).catch(() => {});
+
       setUnlocked(true);
     } catch {
+      // even if save fails, allow viewing
       setUnlocked(true);
     } finally {
       setSaving(false);
@@ -183,7 +177,10 @@ async function onUnlock() {
 
       {SHOW_API_DEBUG && (
         <p className="mt-1 text-xs text-slate-400">
-          API: <a href={API} className="underline">{API}</a>
+          API:{" "}
+          <a href={API} className="underline">
+            {API}
+          </a>
         </p>
       )}
 
@@ -226,24 +223,27 @@ async function onUnlock() {
           <p className="text-sm text-slate-600">
             To view the results, please enter your <b>corporate email</b>.
           </p>
-          <div className="mt-2 flex gap-2">
-            <input
-              type="email"
-              placeholder="you@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input flex-1"
-            />
-            {email ? (
-  isCorporateEmail(email) ? (
-    <div className="text-xs text-emerald-600 mt-1">Corporate email verified.</div>
-  ) : (
-    <div className="text-xs text-red-600 mt-1">
-      Corporate email required — free providers are blocked.
-    </div>
-  )
-) : null}
-
+          <div className="mt-2 flex gap-2 items-start">
+            <div className="flex-1">
+              <input
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input w-full"
+              />
+              {email ? (
+                isCorporateEmail(email) ? (
+                  <div className="text-xs text-emerald-600 mt-1">
+                    Corporate email verified.
+                  </div>
+                ) : (
+                  <div className="text-xs text-red-600 mt-1">
+                    Corporate email required — free providers are blocked.
+                  </div>
+                )
+              ) : null}
+            </div>
             <button onClick={onUnlock} className="btn" disabled={saving}>
               {saving ? "Saving…" : "View results"}
             </button>
