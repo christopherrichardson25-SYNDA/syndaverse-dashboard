@@ -21,8 +21,35 @@ const wtpFrom = (r: ScoreResponse) =>
   typeof r.wtp_impact_0_100 === "number" ? Math.round(r.wtp_impact_0_100) : 0;
 
 // very simple “free email” filter
-const isFreeEmail = (email: string) =>
-  /(gmail|outlook|hotmail|yahoo|icloud|protonmail)\./i.test(email);
+const FREE_DOMAINS = new Set([
+  'gmail.com','googlemail.com',
+  'outlook.com','hotmail.com','live.com','msn.com',
+  'yahoo.com','ymail.com',
+  'icloud.com','me.com','mac.com',
+  'proton.me','protonmail.com',
+  'aol.com','zoho.com','gmx.com','mail.com',
+  'yandex.com','yandex.ru'
+]);
+
+const extractDomain = (email: string) => {
+  const at = email.lastIndexOf('@');
+  if (at < 0) return '';
+  return email.slice(at + 1).toLowerCase().trim();
+};
+
+const isCorporateEmail = (email: string) => {
+  // formato básico
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+  const domain = extractDomain(email);
+  if (!domain.includes('.')) return false;
+
+  // bloquear “free” incluyendo subdominios: foo.gmail.com → gmail.com
+  const base = domain.split('.').slice(-2).join('.');
+  if (FREE_DOMAINS.has(domain) || FREE_DOMAINS.has(base)) return false;
+
+  return true;
+};
+
 
 export default function QuickCheck() {
   // form
@@ -89,25 +116,45 @@ export default function QuickCheck() {
     }
   }
 
-  async function onUnlock() {
-    setErrorMsg("");
-    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-      setErrorMsg("Enter a valid email.");
-      return;
-    }
-    if (isFreeEmail(email)) {
-      setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
-      return;
-    }
-    if (!score) return;
+async function onUnlock() {
+  setErrorMsg("");
 
-    setSaving(true);
-    try {
-      const snapshot = {
-        iet: Math.round(score.score_0_100 || 0),
-        nm: levelFrom(score),
-        wtp: wtpFrom(score),
-      };
+  if (!email) {
+    setErrorMsg("Enter a valid email.");
+    return;
+  }
+  if (!isCorporateEmail(email)) {
+    setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
+    return;
+  }
+  if (!score) return;
+
+  setSaving(true);
+  try {
+    const snapshot = {
+      iet: Math.round(score.score_0_100 || 0),
+      nm: levelFrom(score),
+      wtp: wtpFrom(score),
+    };
+
+    await fetch(`${API}/lead`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        brand,
+        industry,
+        snapshot,
+        source: "quick-check",
+      }),
+    }).catch(() => {});
+    setUnlocked(true);
+  } catch {
+    setUnlocked(true);
+  } finally {
+    setSaving(false);
+  }
+};
 
       // save lead (don’t block viewing if it fails)
       await fetch(`${API}/lead`, {
@@ -187,6 +234,16 @@ export default function QuickCheck() {
               onChange={(e) => setEmail(e.target.value)}
               className="input flex-1"
             />
+            {email ? (
+  isCorporateEmail(email) ? (
+    <div className="text-xs text-emerald-600 mt-1">Corporate email verified.</div>
+  ) : (
+    <div className="text-xs text-red-600 mt-1">
+      Corporate email required — free providers are blocked.
+    </div>
+  )
+) : null}
+
             <button onClick={onUnlock} className="btn" disabled={saving}>
               {saving ? "Saving…" : "View results"}
             </button>
