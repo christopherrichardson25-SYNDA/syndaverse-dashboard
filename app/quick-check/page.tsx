@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 const API =
   process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
+const SHOW_API_DEBUG =
+  (process.env.NEXT_PUBLIC_SHOW_API_DEBUG ?? "").toLowerCase() === "true";
 
 /** ===== Backend response types ===== */
 type ScoreResponse = {
@@ -11,43 +13,24 @@ type ScoreResponse = {
   industry: string;
   score_0_100: number; // IET
   label?: string; // letter (B, C…)
-  level?: string; // text (Relational, etc.)
-  wtp_impact_0_100?: number; // WTP impact if provided
+  level?: string; // text (“Relational”, etc.)
+  wtp_impact_0_100?: number; // WTP impact if present
 };
 
 /** ===== Helpers ===== */
-const isFreeEmail = (email: string) =>
-  /(gmail|outlook|hotmail|yahoo|icloud|protonmail)\./i.test(email);
-
 const levelFrom = (r: ScoreResponse) => r.level || r.label || "—";
 const wtpFrom = (r: ScoreResponse) =>
   typeof r.wtp_impact_0_100 === "number" ? Math.round(r.wtp_impact_0_100) : 0;
 
-/** ===== Page ===== */
 export default function QuickCheck() {
   // Form
   const [brand, setBrand] = useState("");
   const [industry, setIndustry] = useState("_generic");
 
-  // Step 1 → calculate
+  // API state
   const [loading, setLoading] = useState(false);
   const [score, setScore] = useState<ScoreResponse | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
-
-  // Step 2 → corporate email gate
-  const [email, setEmail] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-
-  // One use per browser (soft)
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      localStorage.getItem("truq_used") === "1"
-    ) {
-      // You can enforce any extra logic here if needed
-    }
-  }, []);
 
   async function onCalc() {
     setErrorMsg("");
@@ -62,7 +45,7 @@ export default function QuickCheck() {
         brand: brand.trim(),
         weights_mode: "auto_heuristic",
         data: {
-          // minimal defaults to get coherent IET/NM/WTP
+          // minimal defaults to get a coherent IET/NM/WTP
           sla: 70,
           complaints_rate: 30,
           productivity_per_labor_hour: 60,
@@ -86,54 +69,11 @@ export default function QuickCheck() {
       if (!r.ok) throw new Error(`API /score ${r.status}`);
       const json: ScoreResponse = await r.json();
       setScore(json);
-      if (typeof window !== "undefined") localStorage.setItem("truq_used", "1");
-      // after calculating we still require the corporate email
-      setUnlocked(false);
     } catch {
-      setErrorMsg("We couldn’t calculate. Please check the backend and try again.");
+      setScore(null);
+      setErrorMsg("We couldn't calculate. Please check the backend and try again.");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function onUnlock() {
-    setErrorMsg("");
-    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-      setErrorMsg("Enter a valid email.");
-      return;
-    }
-    if (isFreeEmail(email)) {
-      setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
-      return;
-    }
-    if (!score) return;
-
-    setSaving(true);
-    try {
-      const snapshot = {
-        iet: Math.round(score.score_0_100 || 0),
-        nm: levelFrom(score),
-        wtp: wtpFrom(score),
-      };
-
-      // Best-effort lead capture; even if it fails we’ll unlock
-      await fetch(`${API}/lead`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          brand,
-          industry,
-          snapshot,
-          source: "quick-check",
-        }),
-      }).catch(() => {});
-
-      setUnlocked(true);
-    } catch {
-      setUnlocked(true);
-    } finally {
-      setSaving(false);
     }
   }
 
@@ -141,6 +81,12 @@ export default function QuickCheck() {
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold">Quick TRU-e check</h1>
       <p className="text-slate-600">Three quick indicators: IET, NM, and WTP.</p>
+
+      {SHOW_API_DEBUG && (
+        <p className="mt-1 text-xs text-slate-400">
+          API: <a href={API} className="underline">{API}</a>
+        </p>
+      )}
 
       {/* FORM */}
       <div className="mt-4 grid gap-3">
@@ -175,29 +121,8 @@ export default function QuickCheck() {
         {errorMsg && <div className="text-red-600 text-sm">{errorMsg}</div>}
       </div>
 
-      {/* EMAIL GATE */}
-      {score && !unlocked && (
-        <div className="mt-6 p-4 rounded-xl bg-slate-50 border">
-          <p className="text-sm text-slate-600">
-            To view the results, please enter your <b>corporate email</b>.
-          </p>
-          <div className="mt-2 flex gap-2">
-            <input
-              type="email"
-              placeholder="you@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input flex-1"
-            />
-            <button onClick={onUnlock} className="btn" disabled={saving}>
-              {saving ? "Saving…" : "View results"}
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* RESULTS: IET / NM / WTP */}
-      {score && unlocked && (
+      {score && (
         <div className="mt-6">
           <div className="grid gap-4 md:grid-cols-3">
             <KPI title="IET" value={Math.round(score.score_0_100)} />
@@ -206,12 +131,12 @@ export default function QuickCheck() {
           </div>
 
           <div className="mt-4 p-4 rounded-xl bg-white border shadow-sm">
-            <h3 className="font-semibold mb-1">What does this mean in your industry?</h3>
+            <h3 className="font-semibold mb-1">What does it mean for your industry?</h3>
             <p className="text-sm text-slate-700">
-              <b>IET</b> summarizes the trust index (0–100). <b>NM</b> places the brand
-              in the pyramid (e.g., “Relational”). <b>WTP</b> indicates willingness to
-              pay / estimated impact. For <code>{industry}</code>, these values act as a
-              starting point to prioritize improvements and shape the challenge brief.
+              <b>IET</b> summarizes the trust index (0–100). <b>NM</b> places the brand in the
+              pyramid (e.g., “Relational”). <b>WTP</b> indicates willingness-to-pay / estimated impact.
+              For <code>{industry}</code>, these values are a starting point to prioritize improvements
+              and define the challenge brief.
             </p>
           </div>
         </div>
