@@ -50,7 +50,7 @@ export default function Home() {
             <div className="relative">
               <div className="card p-4 text-center shadow-md">
                 <SyndapsisLogo className="mx-auto h-auto w-64 md:w-72" />
-                <div className="mt-3 text-2xl font-extrabold tracking-wide text-sky-800">
+                <div className="mt-3 text-2xl font-extrabold tracking-wide text-white">
                   SYNDAPSIS
                 </div>
               </div>
