@@ -13,9 +13,18 @@ const LINKS: LinkItem[] = [
   { id: "privacy", label: "Privacy Policy" },
 ];
 
-export default function NavHeader() {
+export default function NavHeader({
+  onOpenChat,
+}: {
+  onOpenChat?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("what");
+
+  const chatHref =
+    process.env.NEXT_PUBLIC_SYNDABRAIN_URL
+      ? `${process.env.NEXT_PUBLIC_SYNDABRAIN_URL}/widget?source=nav`
+      : undefined;
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -26,19 +35,17 @@ export default function NavHeader() {
     return () => obs.disconnect();
   }, []);
 
+  const handleChatClick = () => {
+    if (onOpenChat) return onOpenChat();
+    if (chatHref) return window.open(chatHref, "_blank", "noopener,noreferrer");
+    window.location.href = "mailto:contact@syndaverse.com";
+  };
+
   return (
     <header id="nav-header-v2" className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        {/* LOGO MÁS GRANDE */}
-        <a href="#what" className="flex items-center gap-2" aria-label="Ir al inicio">
-          <Image
-            src="/synda-logo.png"
-            alt="SYNDA"
-            width={240}
-            height={58}
-            priority
-            className="h-11 w-auto md:h-12"
-          />
+        <a href="#what" className="flex items-center gap-2" aria-label="Go to start">
+          <Image src="/synda-logo.png" alt="SYNDA" width={240} height={58} priority className="h-11 w-auto md:h-12" />
         </a>
 
         {/* Desktop */}
@@ -55,19 +62,20 @@ export default function NavHeader() {
               {l.label}
             </a>
           ))}
-          <a
-            href="mailto:contact@syndaverse.com"
+          <button
+            onClick={handleChatClick}
             className="ml-2 inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600"
+            aria-label="Open chat"
           >
             LET’S CHAT
-          </a>
+          </button>
         </div>
 
         {/* Mobile */}
         <button
           onClick={() => setOpen((v) => !v)}
           className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-300 text-slate-700"
-          aria-label="Abrir menú"
+          aria-label="Open menu"
           aria-expanded={open}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -96,12 +104,13 @@ export default function NavHeader() {
                 </li>
               ))}
             </ul>
-            <a
-              href="mailto:contact@syndaverse.com"
+            <button
+              onClick={() => { setOpen(false); handleChatClick(); }}
               className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-base font-semibold text-white transition hover:bg-emerald-600"
+              aria-label="Open chat"
             >
               LET’S CHAT
-            </a>
+            </button>
           </div>
         </div>
       )}
