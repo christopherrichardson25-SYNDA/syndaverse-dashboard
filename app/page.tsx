@@ -1,10 +1,13 @@
+// app/page.tsx
 "use client";
 
 import Image from "next/image";
-import { useState, type ReactNode } from "react";
-import ManifestoModal from "../components/ManifestoModal";
-import NavHeader from "../components/NavHeader";
 import Link from "next/link";
+import { useState, type ReactNode } from "react";
+
+import NavHeader from "../components/NavHeader";
+import ManifestoModal from "../components/ManifestoModal";
+import SyndabrainModal from "../components/SyndabrainModal";
 
 const GH = "https://github.com/christopherrichardson25-SYNDA";
 const REPOS = {
@@ -17,10 +20,12 @@ const REPOS = {
 
 export default function Home() {
   const [manifestoOpen, setManifestoOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <>
-      <NavHeader />
+      {/* Header con callback para abrir el chat */}
+      <NavHeader onOpenChat={() => setChatOpen(true)} />
 
       {/* HERO */}
       <section className="hero relative bg-gradient-to-r from-sky-700 to-blue-900 text-white">
@@ -66,7 +71,7 @@ export default function Home() {
             The SYNDΛ Difference
           </h2>
 
-        <div className="grid items-center gap-8 md:grid-cols-3">
+          <div className="grid items-center gap-8 md:grid-cols-3">
             {/* 2x2 cards con PLUS centrado */}
             <div className="relative md:col-span-2 md:min-h-[360px]">
               <div className="grid gap-6 sm:grid-cols-2">
@@ -126,7 +131,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What we do (simple) */}
+      {/* What we do */}
       <section id="what" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-3 text-xl font-semibold text-slate-900">What we do</h2>
@@ -186,14 +191,11 @@ export default function Home() {
             />
           </div>
 
-          {/* BOTONES CORREGIDOS */}
           <div className="mt-4 flex flex-wrap gap-3">
-            {/* Quick TRU-e check → ruta interna */}
+            {/* Ruta interna (si la tienes): quick-check */}
             <Link href="/quick-check" className="btn-primary">
               Quick TRU-e check
             </Link>
-
-            {/* Onboarding Enterprise → por ahora externo */}
             <a
               className="btn-outline"
               href={REPOS.onboardingEnterprise}
@@ -212,12 +214,8 @@ export default function Home() {
           <h2 className="mb-3 text-xl font-semibold text-slate-900">
             How we do it — Agents
           </h2>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Step
-              n="1"
-              title="Onboarding"
-              desc="Anonymous sign-up and PTrust verification."
-            />
+        <div className="grid gap-4 md:grid-cols-4">
+            <Step n="1" title="Onboarding" desc="Anonymous sign-up and PTrust verification." />
             <Step
               n="2"
               title="Syndaptic Evaluation"
@@ -262,26 +260,10 @@ export default function Home() {
             How we do it — Syndapsis
           </h2>
           <div className="grid gap-4 md:grid-cols-4">
-            <Step
-              n="1"
-              title="Brief & Reward"
-              desc="Publish the challenge with reward and timeline."
-            />
-            <Step
-              n="2"
-              title="AHP Weights"
-              desc="Questionnaire by De Bono hats to define the match."
-            />
-            <Step
-              n="3"
-              title="Ranking & Selection"
-              desc="Agents prioritized by AHP; winners are chosen."
-            />
-            <Step
-              n="4"
-              title="Delivery & Evidence"
-              desc="Validation and learning captured for TRU-e/IET."
-            />
+            <Step n="1" title="Brief & Reward" desc="Publish the challenge with reward and timeline." />
+            <Step n="2" title="AHP Weights" desc="Questionnaire by De Bono hats to define the match." />
+            <Step n="3" title="Ranking & Selection" desc="Agents prioritized by AHP; winners are chosen." />
+            <Step n="4" title="Delivery & Evidence" desc="Validation and learning captured for TRU-e/IET." />
           </div>
         </div>
       </section>
@@ -296,12 +278,7 @@ export default function Home() {
             Marketplace to power companies and agents. Includes Syndabooks.
           </p>
           <div className="mt-4">
-            <a
-              className="btn-primary"
-              href={REPOS.syndatools}
-              target="_blank"
-              rel="noopener"
-            >
+            <a className="btn-primary" href={REPOS.syndatools} target="_blank" rel="noopener">
               Open Syndatools
             </a>
           </div>
@@ -311,19 +288,19 @@ export default function Home() {
       {/* Privacy */}
       <section id="privacy" className="bg-white">
         <div className="container mx-auto max-w-6xl px-4 py-12">
-          <h2 className="mb-2 text-xl font-semibold text-slate-900">
-            Privacy Policy
-          </h2>
+          <h2 className="mb-2 text-xl font-semibold text-slate-900">Privacy Policy</h2>
           <p className="text-slate-700">
-            Minimal data, encryption and explicit consent. Agent identities are
-            protected; merit is evaluated.
+            Minimal data, encryption and explicit consent. Agent identities are protected; merit is evaluated.
           </p>
         </div>
       </section>
 
-      <ManifestoModal
-        open={manifestoOpen}
-        onClose={() => setManifestoOpen(false)}
+      {/* Modals */}
+      <ManifestoModal open={manifestoOpen} onClose={() => setManifestoOpen(false)} />
+      <SyndabrainModal
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        pageContext={{ source: "landing", section: "header" }}
       />
     </>
   );
@@ -370,6 +347,7 @@ function DiffCard({
   );
 }
 
+/* Íconos */
 function ShieldIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -425,3 +403,4 @@ function Step({ n, title, desc }: { n: string; title: string; desc: string }) {
     </div>
   );
 }
+
