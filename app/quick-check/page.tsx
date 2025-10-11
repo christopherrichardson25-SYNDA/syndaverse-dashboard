@@ -2,299 +2,215 @@
 
 import { useState } from "react";
 
-const API =
-  process.env.NEXT_PUBLIC_TRUE_API ?? "https://tru-e-calculator-1.onrender.com";
-const SHOW_API_DEBUG =
-  (process.env.NEXT_PUBLIC_SHOW_API_DEBUG ?? "").toLowerCase() === "true";
-
-type ScoreResponse = {
+type QuickCheckInput = {
   brand: string;
   industry: string;
-  score_0_100: number;
-  label?: string;
-  level?: string;
-  wtp_impact_0_100?: number;
+  price: number | "";
+  wtp: number | "";
+  totalTrust: number | "";   // 0-100
+  iet: number | "";          // 0-100 (coherencia / IET)
 };
 
-const levelFrom = (r: ScoreResponse) => r.level || r.label || "—";
-const wtpFrom = (r: ScoreResponse) =>
-  typeof r.wtp_impact_0_100 === "number" ? Math.round(r.wtp_impact_0_100) : 0;
-
-// --- Corporate email gate helpers ---
-const FREE_DOMAINS = new Set([
-  "gmail.com",
-  "googlemail.com",
-  "outlook.com",
-  "hotmail.com",
-  "live.com",
-  "msn.com",
-  "yahoo.com",
-  "ymail.com",
-  "icloud.com",
-  "me.com",
-  "mac.com",
-  "proton.me",
-  "protonmail.com",
-  "aol.com",
-  "zoho.com",
-  "gmx.com",
-  "mail.com",
-  "yandex.com",
-  "yandex.ru",
-]);
-
-const extractDomain = (email: string) => {
-  const at = email.lastIndexOf("@");
-  if (at < 0) return "";
-  return email.slice(at + 1).toLowerCase().trim();
+type QuickResult = {
+  gap: number;              // WTP - Price
+  pyramidLevel: "Low" | "Mid" | "High";
+  trustMsg: string;
 };
 
-const isCorporateEmail = (email: string) => {
-  // basic format
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
-  const domain = extractDomain(email);
-  if (!domain.includes(".")) return false;
+export default function QuickCheckPage() {
+  const [input, setInput] = useState<QuickCheckInput>({
+    brand: "",
+    industry: "",
+    price: "",
+    wtp: "",
+    totalTrust: "",
+    iet: "",
+  });
 
-  // block free providers incl. subdomains: foo.gmail.com -> gmail.com
-  const base = domain.split(".").slice(-2).join(".");
-  if (FREE_DOMAINS.has(domain) || FREE_DOMAINS.has(base)) return false;
+  const [result, setResult] = useState<QuickResult | null>(null);
 
-  return true;
-};
+  const onChange =
+    (field: keyof QuickCheckInput) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const v = e.target.value;
+      // Campos numéricos controlados
+      if (["price", "wtp", "totalTrust", "iet"].includes(field)) {
+        const asNum = v === "" ? "" : Number(v);
+        setInput((s) => ({ ...s, [field]: asNum }));
+      } else {
+        setInput((s) => ({ ...s, [field]: v }));
+      }
+    };
 
-export default function QuickCheck() {
-  // form
-  const [brand, setBrand] = useState("");
-  const [industry, setIndustry] = useState("_generic");
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  // calc
-  const [loading, setLoading] = useState(false);
-  const [score, setScore] = useState<ScoreResponse | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+    const price = typeof input.price === "number" ? input.price : 0;
+    const wtp = typeof input.wtp === "number" ? input.wtp : 0;
+    const totalTrust =
+      typeof input.totalTrust === "number" ? input.totalTrust : 0;
+    const iet = typeof input.iet === "number" ? input.iet : 0;
 
-  // email gate
-  const [email, setEmail] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
+    const gap = Number((wtp - price).toFixed(2));
 
-  async function onCalc() {
-    setErrorMsg("");
-    setUnlocked(false);
-    setScore(null);
+    // Heurística simple de nivel de pirámide en base a totalTrust e IET
+    let pyramidLevel: QuickResult["pyramidLevel"] = "Low";
+    if (totalTrust >= 70 && iet >= 65) pyramidLevel = "High";
+    else if (totalTrust >= 40 && iet >= 35) pyramidLevel = "Mid";
 
-    if (!brand.trim()) {
-      setErrorMsg("Please enter a brand.");
-      return;
-    }
+    const trustMsg =
+      pyramidLevel === "High"
+        ? "High trust: keep compounding evidence and scale challenges."
+        : pyramidLevel === "Mid"
+        ? "Mid trust: prioritize credibility gaps via targeted challenges."
+        : "Low trust: start with foundational coherence (IET) and quick wins.";
 
-    setLoading(true);
-    try {
-      const payload = {
-        industry,
-        brand: brand.trim(),
-        weights_mode: "auto_heuristic",
-        data: {
-          sla: 70,
-          complaints_rate: 30,
-          productivity_per_labor_hour: 60,
-          caov: 55,
-          esg: 58,
-          governance: 62,
-          nps: 10,
-          satisfaction: 72,
-          digital_rep: 65,
-          brand_promise: 70,
-          brand_perception: 66,
-          wtp_premium_pct: 0,
-        },
-      };
-
-      const r = await fetch(`${API}/score`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!r.ok) throw new Error(`API /score ${r.status}`);
-      const json: ScoreResponse = await r.json();
-      setScore(json);
-      // now require email to unlock
-      setUnlocked(false);
-    } catch {
-      setScore(null);
-      setErrorMsg("We couldn't calculate. Please check the backend and try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onUnlock() {
-    setErrorMsg("");
-
-    if (!email) {
-      setErrorMsg("Enter a valid email.");
-      return;
-    }
-    if (!isCorporateEmail(email)) {
-      setErrorMsg("Use a corporate email (no Gmail/Outlook/etc.).");
-      return;
-    }
-    if (!score) return;
-
-    setSaving(true);
-    try {
-      const snapshot = {
-        iet: Math.round(score.score_0_100 || 0),
-        nm: levelFrom(score),
-        wtp: wtpFrom(score),
-      };
-
-      // save lead (don’t block viewing if it fails)
-      await fetch(`${API}/lead`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          brand,
-          industry,
-          snapshot,
-          source: "quick-check",
-        }),
-      }).catch(() => {});
-
-      setUnlocked(true);
-    } catch {
-      // even if save fails, allow viewing
-      setUnlocked(true);
-    } finally {
-      setSaving(false);
-    }
-  }
+    setResult({ gap, pyramidLevel, trustMsg });
+  };
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="text-2xl font-semibold">Quick TRU-e check</h1>
-      <p className="text-slate-600">Three quick indicators: IET, NM, and WTP.</p>
+    <main className="mx-auto max-w-3xl px-4 py-10">
+      <h1 className="text-2xl font-semibold text-slate-900">
+        Quick TRU-e check
+      </h1>
+      <p className="mt-2 text-slate-700">
+        Enter a few values to estimate your{" "}
+        <strong>Trust level</strong>, the <strong>WTP↔Price gap</strong> and a
+        quick guidance. This is motivational only — run the full TRU-e
+        onboarding to get a complete diagnostic.
+      </p>
 
-      {SHOW_API_DEBUG && (
-        <p className="mt-1 text-xs text-slate-400">
-          API:{" "}
-          <a href={API} className="underline">
-            {API}
-          </a>
-        </p>
-      )}
-
-      {/* form */}
-      <div className="mt-4 grid gap-3">
-        <div>
-          <label className="text-sm text-slate-600">Brand</label>
+      <form onSubmit={onSubmit} className="mt-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="grid gap-2">
+          <label className="text-sm font-medium text-slate-800" htmlFor="brand">
+            Brand / Organization
+          </label>
           <input
-            className="input w-full"
-            placeholder="e.g., Acme Corp"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
+            id="brand"
+            value={input.brand}
+            onChange={onChange("brand")}
+            className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+            placeholder="Acme Corp"
           />
         </div>
 
-        <div>
-          <label className="text-sm text-slate-600">Industry</label>
-          <select
-            className="input w-full"
-            value={industry}
-            onChange={(e) => setIndustry(e.target.value)}
+        <div className="grid gap-2">
+          <label className="text-sm font-medium text-slate-800" htmlFor="industry">
+            Industry (optional)
+          </label>
+          <input
+            id="industry"
+            value={input.industry}
+            onChange={onChange("industry")}
+            className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+            placeholder="Agri, Health, Energy..."
+          />
+        </div>
+
+        <div className="grid gap-2 md:grid-cols-2">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-slate-800" htmlFor="price">
+              Current Price (avg)
+            </label>
+            <input
+              id="price"
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              value={input.price}
+              onChange={onChange("price")}
+              className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+              placeholder="e.g. 12.90"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-slate-800" htmlFor="wtp">
+              WTP — Willingness To Pay (avg)
+            </label>
+            <input
+              id="wtp"
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              value={input.wtp}
+              onChange={onChange("wtp")}
+              className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+              placeholder="e.g. 14.50"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-2 md:grid-cols-2">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-slate-800" htmlFor="trust">
+              Total Trust (0–100)
+            </label>
+            <input
+              id="trust"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={100}
+              value={input.totalTrust}
+              onChange={onChange("totalTrust")}
+              className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+              placeholder="e.g. 62"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium text-slate-800" htmlFor="iet">
+              IET / Coherence (0–100)
+            </label>
+            <input
+              id="iet"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={100}
+              value={input.iet}
+              onChange={onChange("iet")}
+              className="rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-600"
+              placeholder="e.g. 55"
+            />
+          </div>
+        </div>
+
+        <div className="mt-2 flex flex-wrap gap-3">
+          <button type="submit" className="inline-flex items-center rounded-full bg-emerald-500 px-5 py-2.5 font-semibold text-white hover:bg-emerald-600">
+            Calculate
+          </button>
+          <button
+            type="button"
+            onClick={() => { setResult(null); setInput({ brand: "", industry: "", price: "", wtp: "", totalTrust: "", iet: "" }); }}
+            className="inline-flex items-center rounded-full border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 hover:bg-slate-50"
           >
-            <option value="_generic">_generic</option>
-            <option value="banking">banking</option>
-            <option value="retail">retail</option>
-            <option value="telco">telco</option>
-          </select>
+            Reset
+          </button>
         </div>
+      </form>
 
-        <button onClick={onCalc} className="btn w-fit" disabled={loading}>
-          {loading ? "Calculating…" : "Calculate"}
-        </button>
-
-        {errorMsg && <div className="text-red-600 text-sm">{errorMsg}</div>}
-      </div>
-
-      {/* email gate */}
-      {score && !unlocked && (
-        <div className="mt-6 p-4 rounded-xl bg-slate-50 border">
-          <p className="text-sm text-slate-600">
-            To view the results, please enter your <b>corporate email</b>.
-          </p>
-          <div className="mt-2 flex gap-2 items-start">
-            <div className="flex-1">
-              <input
-                type="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input w-full"
-              />
-              {email ? (
-                isCorporateEmail(email) ? (
-                  <div className="text-xs text-emerald-600 mt-1">
-                    Corporate email verified.
-                  </div>
-                ) : (
-                  <div className="text-xs text-red-600 mt-1">
-                    Corporate email required — free providers are blocked.
-                  </div>
-                )
-              ) : null}
-            </div>
-            <button onClick={onUnlock} className="btn" disabled={saving}>
-              {saving ? "Saving…" : "View results"}
-            </button>
+      {result && (
+        <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">Results</h2>
+          <div className="mt-3 grid gap-4 md:grid-cols-3">
+            <Stat label="WTP↔Price Gap" value={`${result.gap.toFixed(2)}`} hint="(WTP - Price)" />
+            <Stat label="Pyramid Level" value={result.pyramidLevel} />
+            <Stat label="Guidance" value={result.trustMsg} />
           </div>
-        </div>
+        </section>
       )}
-
-      {/* results */}
-      {score && unlocked && (
-        <div className="mt-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <KPI title="IET" value={Math.round(score.score_0_100)} />
-            <KPI title="NM" value={levelFrom(score)} />
-            <KPI title="WTP" value={wtpFrom(score)} />
-          </div>
-
-          <div className="mt-4 p-4 rounded-xl bg-white border shadow-sm">
-            <h3 className="font-semibold mb-1">What does it mean for your industry?</h3>
-            <p className="text-sm text-slate-700">
-              <b>IET</b> summarizes the trust index (0–100). <b>NM</b> places the brand in the
-              pyramid (e.g., “Relational”). <b>WTP</b> indicates willingness-to-pay / estimated
-              impact. For <code>{industry}</code>, these values help prioritize improvements and
-              define the challenge brief.
-            </p>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        .input {
-          border: 1px solid #e5e7eb;
-          padding: 10px;
-          border-radius: 12px;
-        }
-        .btn {
-          background: #0b2742;
-          color: #fff;
-          padding: 10px 14px;
-          border-radius: 12px;
-        }
-      `}</style>
     </main>
   );
 }
 
-function KPI({ title, value }: { title: string; value: string | number }) {
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-2xl border p-4 bg-white shadow-sm">
-      <div className="text-sm text-slate-500">{title}</div>
-      <div className="text-3xl font-bold mt-1">{String(value)}</div>
+    <div className="rounded-lg border border-slate-200 p-4">
+      <div className="text-sm text-slate-600">{label}</div>
+      <div className="text-xl font-semibold text-slate-900">{value}</div>
+      {hint ? <div className="text-xs text-slate-500">{hint}</div> : null}
     </div>
   );
 }
-
