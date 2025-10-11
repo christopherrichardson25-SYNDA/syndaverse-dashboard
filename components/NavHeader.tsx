@@ -16,12 +16,11 @@ const LINKS: LinkItem[] = [
 export default function NavHeader({
   onOpenChat,
 }: {
-  onOpenChat?: () => void; // <- callback para abrir el modal de Syndabrain
+  onOpenChat?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("what");
 
-  // URL pública del widget del chat para fallback si no se pasa onOpenChat
   const chatHref =
     process.env.NEXT_PUBLIC_SYNDABRAIN_URL
       ? `${process.env.NEXT_PUBLIC_SYNDABRAIN_URL}/widget?source=nav`
@@ -32,40 +31,21 @@ export default function NavHeader({
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: "-40% 0px -55% 0px", threshold: 0.01 }
     );
-    LINKS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
+    LINKS.forEach(({ id }) => { const el = document.getElementById(id); if (el) obs.observe(el); });
     return () => obs.disconnect();
   }, []);
 
   const handleChatClick = () => {
-    if (onOpenChat) {
-      onOpenChat();
-    } else if (chatHref) {
-      window.open(chatHref, "_blank", "noopener,noreferrer");
-    } else {
-      // último recurso si no hay URL ni callback
-      window.location.href = "mailto:contact@syndaverse.com";
-    }
+    if (onOpenChat) return onOpenChat();
+    if (chatHref) return window.open(chatHref, "_blank", "noopener,noreferrer");
+    window.location.href = "mailto:contact@syndaverse.com";
   };
 
   return (
-    <header
-      id="nav-header-v2"
-      className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80"
-    >
+    <header id="nav-header-v2" className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        {/* LOGO */}
         <a href="#what" className="flex items-center gap-2" aria-label="Go to start">
-          <Image
-            src="/synda-logo.png"
-            alt="SYNDA"
-            width={240}
-            height={58}
-            priority
-            className="h-11 w-auto md:h-12"
-          />
+          <Image src="/synda-logo.png" alt="SYNDA" width={240} height={58} priority className="h-11 w-auto md:h-12" />
         </a>
 
         {/* Desktop */}
@@ -76,9 +56,7 @@ export default function NavHeader({
               href={`#${l.id}`}
               className={[
                 "inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition",
-                active === l.id
-                  ? "border-blue-600 text-blue-700"
-                  : "border-slate-300 text-slate-700 hover:bg-slate-50",
+                active === l.id ? "border-blue-600 text-blue-700" : "border-slate-300 text-slate-700 hover:bg-slate-50",
               ].join(" ")}
             >
               {l.label}
@@ -118,9 +96,7 @@ export default function NavHeader({
                     onClick={() => setOpen(false)}
                     className={[
                       "block rounded-xl border px-4 py-3 text-base font-medium",
-                      active === l.id
-                        ? "border-blue-600 text-blue-700"
-                        : "border-slate-300 text-slate-700 hover:bg-slate-50",
+                      active === l.id ? "border-blue-600 text-blue-700" : "border-slate-300 text-slate-700 hover:bg-slate-50",
                     ].join(" ")}
                   >
                     {l.label}
@@ -128,12 +104,8 @@ export default function NavHeader({
                 </li>
               ))}
             </ul>
-
             <button
-              onClick={() => {
-                setOpen(false);
-                handleChatClick();
-              }}
+              onClick={() => { setOpen(false); handleChatClick(); }}
               className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-5 py-3 text-base font-semibold text-white transition hover:bg-emerald-600"
               aria-label="Open chat"
             >
@@ -145,4 +117,3 @@ export default function NavHeader({
     </header>
   );
 }
-
