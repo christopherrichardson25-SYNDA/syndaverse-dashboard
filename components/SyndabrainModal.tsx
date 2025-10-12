@@ -14,6 +14,86 @@ type Props = {
 
 type ChatMsg = { who: "me" | "bot"; text: string; meta?: string };
 
+type Ethics = {
+  label?: string;
+  state?: string;
+  allowed?: boolean;
+  score?: number;
+  mitigations?: string[];
+};
+
+type ApiInner = {
+  ethics?: Ethics;
+  reply?: string;
+  result?: unknown[];
+  state?: string;
+};
+
+type ApiReply = {
+  data?: ApiInner;
+  ethics?: Ethics;
+  reply?: string;
+  result?: unknown[];
+  state?: string;
+};
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null;
+}
+
+function asNumber(v: unknown): number | undefined {
+  return typeof v === "number" ? v : undefined;
+}
+function asString(v: unknown): string | undefined {
+  return typeof v === "string" ? v : undefined;
+}
+function asStringArray(v: unknown): string[] | undefined {
+  return Array.isArray(v) && v.every((x) => typeof x === "string")
+    ? (v as string[])
+    : undefined;
+}
+
+function readEthics(v: unknown): Ethics | undefined {
+  if (!isRecord(v)) return undefined;
+  const e: Ethics = {};
+  if (typeof v.label === "string") e.label = v.label;
+  if (typeof v.state === "string") e.state = v.state;
+  if (typeof v.allowed === "boolean") e.allowed = v.allowed;
+  if (typeof v.score === "number") e.score = v.score;
+  if (Array.isArray(v.mitigations) && v.mitigations.every((x) => typeof x === "string")) {
+    e.mitigations = v.mitigations as string[];
+  }
+  return e;
+}
+
+function readApiInner(v: unknown): ApiInner | undefined {
+  if (!isRecord(v)) return undefined;
+  const inner: ApiInner = {};
+  const ethics = readEthics(v.ethics);
+  if (ethics) inner.ethics = ethics;
+  const reply = asString(v.reply);
+  if (reply) inner.reply = reply;
+  if (Array.isArray(v.result)) inner.result = v.result as unknown[];
+  const state = asString(v.state);
+  if (state) inner.state = state;
+  return inner;
+}
+
+function readApiReply(v: unknown): ApiReply {
+  const out: ApiReply = {};
+  if (!isRecord(v)) return out;
+  const inner = readApiInner(v.data);
+  if (inner) out.data = inner;
+  const ethics = readEthics(v.ethics);
+  if (ethics) out.ethics = ethics;
+  const reply = asString(v.reply);
+  if (reply) out.reply = reply;
+  if (Array.isArray(v.result)) out.result = v.result as unknown[];
+  const state = asString(v.state);
+  if (state) out.state = state;
+  return out;
+}
+
 function errToMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
   if (typeof err === "string") return err;
@@ -122,45 +202,38 @@ export default function SyndabrainModal({
         }),
       });
 
-      const data = (await res.json().catch(() => ({}))) as unknown as {
-        data?: any;
-        ethics?: any;
-        reply?: string;
-        result?: unknown[];
-        state?: string;
-      };
+      const raw = (await res.json().catch(() => ({}))) as unknown;
+      const data = readApiReply(raw);
 
-      const ethics = data?.data?.ethics ?? data?.ethics ?? {};
+      const ethics = data.data?.ethics ?? data.ethics ?? {};
       const label =
-        ethics?.label ??
-        ethics?.state ??
-        (ethics?.allowed === false ? "BLOCKED" : "HARMONIC");
+        ethics.label ??
+        ethics.state ??
+        (ethics.allowed === false ? "BLOCKED" : "HARMONIC");
       const score =
-        typeof ethics?.score === "number"
-          ? ethics.score.toFixed(2)
-          : ethics?.score ?? "";
+        typeof ethics.score === "number" ? ethics.score.toFixed(2) : undefined;
 
       const mitig =
-        Array.isArray(ethics?.mitigations) && ethics.mitigations.length
+        ethics.mitigations && ethics.mitigations.length
           ? ` • Mitigations: ${ethics.mitigations.join(", ")}`
           : "";
 
       const state =
-        (Array.isArray(data?.data?.result) && data?.data?.result?.[0]) ??
-        (Array.isArray(data?.result) && data?.result?.[0]) ??
-        data?.state ??
+        (Array.isArray(data.data?.result) && data.data?.result?.[0]) ??
+        (Array.isArray(data.result) && data.result?.[0]) ??
+        data.state ??
         "";
 
-      const meta =
-        label || score || state
-          ? `Ethics: ${label}${score ? ` (score: ${score})` : ""}${
-              mitig ? mitig : ""
-            }${state ? ` • Brain state: ${state}` : ""}`
-          : undefined;
+      const metaParts: string[] = [];
+      if (label) metaParts.push(`Ethics: ${label}${score ? ` (score: ${score})` : ""}`);
+      if (mitig) metaParts.push(mitig.trim());
+      if (state) metaParts.push(`Brain state: ${String(state)}`);
+
+      const meta = metaParts.length ? metaParts.join(" • ") : undefined;
 
       const botText =
-        data?.data?.reply ??
-        data?.reply ??
+        data.data?.reply ??
+        data.reply ??
         "Processed. (No textual reply provided by backend)";
 
       setMessages((m) => [...m, { who: "bot", text: botText, meta }]);
@@ -307,7 +380,7 @@ export default function SyndabrainModal({
           height: 100%; overflow:auto; background:#fbfbfc;
         }
         .msg { max-width:75%; padding:10px 12px; border-radius:12px; line-height:1.35; }
-        .msg.me { align-self:flex-end; background:#e6f4ff; border:1px solid #bfdbfe; }
+        .msg.me { align-self:flex-end; background:#e6f4ff; border-color:#bfdbfe; border:1px solid #bfdbfe; }
         .msg.bot { align-self:flex-start; background:#f3f4f6; border:1px solid #e5e7eb; }
         .meta { font-size:12px; opacity:.8; margin-top:4px; }
 
@@ -337,4 +410,3 @@ export default function SyndabrainModal({
     </dialog>
   );
 }
-
