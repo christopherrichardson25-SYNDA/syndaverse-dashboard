@@ -1,19 +1,13 @@
-import { NextResponse } from "next/server";
-
-const SYNDABRAIN_URL = process.env.SYNDABRAIN_URL!;
+type Mode = "auto" | "tecnico" | "mentor" | "ethica" | "cognitive";
+type ChatBody = { message: string; mode?: Mode };
 
 export async function POST(req: Request) {
-  try {
-    const body: unknown = await req.json();
-    const r = await fetch(`${SYNDABRAIN_URL}/api/chat`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data: unknown = await r.json();
-    return NextResponse.json(data, { status: 200 });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: msg }, { status: 200 });
-  }
+  const body = (await req.json()) as ChatBody;
+  const mode: Mode = body.mode ?? "auto";
+  return Response.json({
+    reply: "Hola, ¿en qué te ayudo?",
+    text: "Hola, ¿en qué te ayudo?",
+    mode,
+    ethics: { status: "HARMONIC", weights: {} }
+  });
 }
