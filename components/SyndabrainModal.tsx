@@ -14,6 +14,16 @@ type Props = {
 
 type ChatMsg = { who: "me" | "bot"; text: string; meta?: string };
 
+function errToMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return "Unknown error";
+  }
+}
+
 export default function SyndabrainModal({
   open,
   onClose,
@@ -49,7 +59,6 @@ export default function SyndabrainModal({
     if (!d) return;
     if (open && !d.open) {
       d.showModal();
-      // pequeño delay para focusear el input
       setTimeout(() => inputRef.current?.focus(), 10);
     }
     if (!open && d.open) d.close();
@@ -67,7 +76,7 @@ export default function SyndabrainModal({
     return () => d.removeEventListener("cancel", onCancel);
   }, [onClose]);
 
-  // Scroll al final cuando llegan mensajes
+  // Scroll al final al actualizar mensajes
   useEffect(() => {
     const el = bodyRef.current;
     if (!el) return;
@@ -86,14 +95,14 @@ export default function SyndabrainModal({
     if (!inside) onClose();
   };
 
-  // Normaliza el contexto de página, por si deseas enviarlo en la carga
+  // Normaliza contexto
   const normalizedContext = useMemo(() => {
     const out: Record<string, string> = {};
     Object.entries(pageContext).forEach(([k, v]) => (out[k] = v == null ? "" : String(v)));
     return out;
   }, [pageContext]);
 
-  // Llamada al API Route (server-side) que forwardea a SYNDABRAIN_API_URL
+  // Llamada al API Route que reenvía a SYNDABRAIN_API_URL
   async function send() {
     const text = q.trim();
     if (!text || pending) return;
@@ -113,27 +122,32 @@ export default function SyndabrainModal({
         }),
       });
 
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as unknown as {
+        data?: any;
+        ethics?: any;
+        reply?: string;
+        result?: unknown[];
+        state?: string;
+      };
 
-      // Formateo de respuesta ética (si está)
-      const ethics = data?.data?.ethics || data?.ethics || {};
+      const ethics = data?.data?.ethics ?? data?.ethics ?? {};
       const label =
-        ethics.label ??
-        ethics.state ??
-        (ethics.allowed === false ? "BLOCKED" : "HARMONIC");
+        ethics?.label ??
+        ethics?.state ??
+        (ethics?.allowed === false ? "BLOCKED" : "HARMONIC");
       const score =
-        typeof ethics.score === "number"
+        typeof ethics?.score === "number"
           ? ethics.score.toFixed(2)
-          : ethics.score ?? "";
+          : ethics?.score ?? "";
 
       const mitig =
-        Array.isArray(ethics.mitigations) && ethics.mitigations.length
+        Array.isArray(ethics?.mitigations) && ethics.mitigations.length
           ? ` • Mitigations: ${ethics.mitigations.join(", ")}`
           : "";
 
       const state =
-        data?.data?.result?.[0] ??
-        data?.result?.[0] ??
+        (Array.isArray(data?.data?.result) && data?.data?.result?.[0]) ??
+        (Array.isArray(data?.result) && data?.result?.[0]) ??
         data?.state ??
         "";
 
@@ -150,10 +164,10 @@ export default function SyndabrainModal({
         "Processed. (No textual reply provided by backend)";
 
       setMessages((m) => [...m, { who: "bot", text: botText, meta }]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessages((m) => [
         ...m,
-        { who: "bot", text: `Error: ${err?.message ?? String(err)}` },
+        { who: "bot", text: `Error: ${errToMessage(err)}` },
       ]);
     } finally {
       setPending(false);
@@ -323,3 +337,4 @@ export default function SyndabrainModal({
     </dialog>
   );
 }
+
