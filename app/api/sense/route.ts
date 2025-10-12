@@ -1,19 +1,13 @@
-import { NextResponse } from "next/server";
-
-const SYNDABRAIN_URL = process.env.SYNDABRAIN_URL!;
+type SenseBody = {
+  sensor_id: string;
+  payload?: Record<string, unknown>;
+  objective?: { name?: string } | string;
+};
 
 export async function POST(req: Request) {
-  try {
-    const body: unknown = await req.json();
-    const r = await fetch(`${SYNDABRAIN_URL}/api/sense`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data: unknown = await r.json();
-    return NextResponse.json(data, { status: 200 });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, error: msg }, { status: 200 });
-  }
+  const { sensor_id, objective } = (await req.json()) as SenseBody;
+  const meaning = Math.random() > 0.5 ? "Alta temperatura" : "Baja temperatura";
+  const resonance = Math.round((0.7 + Math.random() * 0.1) * 10000) / 10000;
+  const obj = typeof objective === "string" ? objective : objective?.name ?? "General";
+  return Response.json({ ok: true, sensor_id, meaning, resonance, objective: obj });
 }
