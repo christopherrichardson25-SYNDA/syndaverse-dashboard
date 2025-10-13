@@ -43,7 +43,7 @@ export default function SyndabrainWidgetPage() {
     setSending(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat/", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ message: text }),
