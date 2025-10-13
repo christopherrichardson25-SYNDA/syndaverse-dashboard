@@ -1,13 +1,30 @@
-type Mode = "auto" | "tecnico" | "mentor" | "ethica" | "cognitive";
-type ChatBody = { message: string; mode?: Mode };
+// app/api/chat/route.ts
+export const runtime = "edge"; // opcional (puedes quitarlo si prefieres node)
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as ChatBody;
-  const mode: Mode = body.mode ?? "auto";
-  return Response.json({
-    reply: "Hola, ¿en qué te ayudo?",
-    text: "Hola, ¿en qué te ayudo?",
-    mode,
-    ethics: { status: "HARMONIC", weights: {} }
+  const base = process.env.SYNDABRAIN_API_URL;
+  if (!base) {
+    return new Response(
+      JSON.stringify({ error: "SYNDABRAIN_API_URL no está configurada" }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  let body: unknown = {};
+  try {
+    body = await req.json();
+  } catch {
+    // body vacío también es válido
+  }
+
+  const r = await fetch(`${base}/chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
   });
+
+  // Pasamos el contenido tal cual (json o texto)
+  const text = await r.text();
+  const ct = r.headers.get("content-type") ?? "application/json";
+  return new Response(text, { status: r.status, headers: { "content-type": ct } });
 }
