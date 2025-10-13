@@ -1,67 +1,76 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
+import SyndabrainModal from "./SyndabrainModal";
 
-type Props = {
-  onOpenChat: () => void;
-};
+export default function NavHeader() {
+  const [openChat, setOpenChat] = useState(false);
 
-export default function NavHeader({ onOpenChat }: Props) {
+  // Si quieres forzar el widget interno siempre,
+  // asegúrate que NEXT_PUBLIC_SYNDABRAIN_URL="/syndabrain" en .env.local
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/70 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-slate-800/60 dark:bg-[#0B0F19]/85">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-        {/* LEFT: Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          {/* Si no tienes /logo.svg, queda el texto como fallback */}
-          <div className="relative h-7 w-7">
-            {/* descomenta si tienes el asset
-            <Image src="/logo.svg" alt="SYNDΛverse" fill />
-            */}
-            <span className="inline-block h-7 w-7 rounded bg-indigo-600 text-center text-sm font-bold leading-7 text-white">
-              Λ
+    <>
+      <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur border-b border-slate-200 dark:bg-[#0B0F19]/90 dark:border-slate-800">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logo.png"
+              alt="SYNDΛverse"
+              width={28}
+              height={28}
+              priority
+            />
+            <span className="font-semibold tracking-tight hidden sm:block">
+              SYNDΛverse
             </span>
-          </div>
-          <span className="text-base font-semibold tracking-wide">
-            SYNDΛverse
-          </span>
-        </Link>
-
-        {/* RIGHT: Navigation */}
-        <nav className="flex items-center gap-4 md:gap-6">
-          <Link
-            href="/"
-            className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-          >
-            Home
           </Link>
 
-          <Link
-            href="/quick-check"
-            className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-          >
-            Quick Check
-          </Link>
+          {/* Links */}
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <Link href="/#what-we-do" className="hover:opacity-80">
+              What we do
+            </Link>
+            <Link href="/#how-we-do-it" className="hover:opacity-80">
+              How we do it
+            </Link>
+            <Link href="/#syndatools" className="hover:opacity-80">
+              Syndatools
+            </Link>
+            <Link href="/privacy" className="hover:opacity-80">
+              Privacy Policy
+            </Link>
 
-          {/* Ejemplos adicionales (opcional) */}
-          <a
-            href="https://syndaverse.com"
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-          >
-            Site
-          </a>
+            {/* CTA */}
+            <button
+              onClick={() => setOpenChat(true)}
+              className="rounded-lg border px-3 py-2 bg-[#0B5CFF] text-white hover:opacity-90"
+            >
+              Let&apos;s Chat
+            </button>
+          </nav>
 
-          {/* CTA: Let's Chat */}
+          {/* En móviles: solo botón Chat, los links pueden ir en un menú si luego quieres */}
           <button
-            onClick={onOpenChat}
-            className="rounded-lg border border-indigo-600 bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            onClick={() => setOpenChat(true)}
+            className="md:hidden rounded-lg border px-3 py-2 bg-[#0B5CFF] text-white hover:opacity-90"
+            aria-label="Open chat"
           >
-            Let’s Chat
+            Chat
           </button>
-        </nav>
-      </div>
-    </header>
+        </div>
+      </header>
+
+      {/* Modal del chat */}
+      <SyndabrainModal
+        open={openChat}
+        onClose={() => setOpenChat(false)}
+        // Opcional: pasa userId / userEmail si los tienes
+        pageContext={{ from: "header", page: "home" }}
+      />
+    </>
   );
 }
+
