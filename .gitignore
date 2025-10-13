@@ -51,3 +51,6 @@ next-env.d.ts
 # backups
 *.bak
 .env.local
+*.bak.*
+cookies.txt
+app/app.py
