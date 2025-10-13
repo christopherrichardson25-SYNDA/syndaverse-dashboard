@@ -14,7 +14,7 @@ export default function NavHeader() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="SYNDΛverse" width={28} height={28} priority />
+            <Image src="/synda-logo.png" alt="SYNDΛverse" width={28} height={28} priority/>
             <span className="font-semibold tracking-tight hidden sm:block">SYNDΛverse</span>
           </Link>
 
