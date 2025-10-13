@@ -1,53 +1,22 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-  // 1️⃣ Variables de entorno
-  const base = process.env.SYNDABRAIN_API_URL;
-  const path = process.env.SYNDABRAIN_API_PATH || "/chat";
-
-  if (!base) {
-    return Response.json(
-      { error: "SYNDABRAIN_API_URL no está configurada" },
-      { status: 500 }
-    );
-  }
-
-  // 2️⃣ Leer el body del request (una sola vez)
-  let payload: unknown;
+export async function POST(req: Request) {
   try {
-    payload = await req.json();
-  } catch {
-    payload = {};
-  }
-
-  // 3️⃣ Construir la URL completa del backend
-  const url = `${base.replace(/\/+$/, "")}${
-    path.startsWith("/") ? path : `/${path}`
-  }`;
-
-  try {
-    // 4️⃣ Enviar al backend Python/FastAPI
-    const upstream = await fetch(url, {
+    const { message } = await req.json();
+    // URL pública de tu backend Python (Syndabrain)
+    const backend = process.env.NEXT_PUBLIC_SYNDABRAIN_URL || "https://syndabrain.vercel.app";
+    const r = await fetch(`${backend}/chat`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
     });
-
-    // 5️⃣ Leer respuesta una sola vez (sin consumir doble)
-    const text = await upstream.text();
-    const ct =
-      upstream.headers.get("content-type") ?? "text/plain; charset=utf-8";
-
-    // 6️⃣ Devolver el mismo contenido al frontend
-    return new Response(text, {
-      status: upstream.status,
-      headers: { "content-type": ct },
-    });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return Response.json(
-      { error: `Proxy error: ${msg}`, target: url },
-      { status: 502 }
-    );
+    const data = await r.text();
+    return new NextResponse(data, { status: 200 });
+  } catch (err: any) {
+    return new NextResponse(JSON.stringify({ error: err.message }), { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({ ok: true, message: "Syndabrain endpoint activo" });
 }
