@@ -41,7 +41,7 @@ export default function SyndabrainModal({
     ([k, v]) => [k, v == null ? "" : String(v)]
   );
 
-  const base = process.env.NEXT_PUBLIC_SYNDABRAIN_URL ?? "https://chat.syndabrain.ai";
+  const base = "/syndabrain/widget";
   const qs = new URLSearchParams({
     uid: userId ?? "",
     email: userEmail ?? "",
@@ -49,7 +49,7 @@ export default function SyndabrainModal({
     ...Object.fromEntries(normalizedEntries),
   }).toString();
 
-  const src = `${base}/widget?${qs}`;
+  const src = `${base}?${qs}`;
 
   const onBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const d = dialogRef.current!;
