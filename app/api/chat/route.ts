@@ -1,68 +1,57 @@
-// app/api/chat/route.ts
-export const runtime = "nodejs"; // o "edge" si prefieres
+import { NextRequest, NextResponse } from "next/server";
 
-type ChatRequest = { message?: string };
+const backend = process.env.SYNDABRAIN_API_URL;
 
-const SYNDABRAIN_API_URL = process.env.SYNDABRAIN_API_URL;
-
-/** GET: pequeño healthcheck para que no 404 y puedas hacer `curl | jq` */
+// Healthcheck GET
 export async function GET() {
-  return new Response(
-    JSON.stringify({
-      ok: true,
-      service: "syndaverse /api/chat",
-      backend: SYNDABRAIN_API_URL ? "configured" : "missing",
-    }),
-    { status: 200, headers: { "content-type": "application/json" } }
-  );
+  return NextResponse.json({
+    ok: true,
+    service: "syndaverse /api/chat",
+    backend: backend ? "configured" : "missing",
+  });
 }
 
-/** POST: proxyea al backend de SyndaBrain */
-export async function POST(req: Request) {
-  if (!SYNDABRAIN_API_URL) {
-    return new Response(
-      JSON.stringify({ error: "SYNDABRAIN_API_URL no está configurada" }),
-      { status: 500, headers: { "content-type": "application/json" } }
+type ChatBody = {
+  message: string;
+  userId?: string | null;
+  context?: Record<string, unknown>;
+};
+
+// Proxy POST -> Syndabrain
+export async function POST(req: NextRequest) {
+  if (!backend) {
+    return NextResponse.json(
+      { error: "SYNDABRAIN_API_URL no está configurada" },
+      { status: 500 }
     );
   }
 
-  let payload: ChatRequest;
+  let body: ChatBody;
   try {
-    payload = (await req.json()) as ChatRequest;
+    body = (await req.json()) as ChatBody;
   } catch {
-    return new Response(
-      JSON.stringify({ error: "JSON inválido" }),
-      { status: 400, headers: { "content-type": "application/json" } }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const message = (payload.message ?? "").trim();
-  if (!message) {
-    return new Response(
-      JSON.stringify({ error: "message requerido" }),
-      { status: 400, headers: { "content-type": "application/json" } }
-    );
-  }
+  const url = `${backend.replace(/\/$/, "")}/api/chat`;
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-  try {
-    const upstream = await fetch(`${SYNDABRAIN_API_URL}/chat`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ message }),
+  const contentType = resp.headers.get("content-type") ?? "";
+  const text = await resp.text();
+
+  if (!resp.ok) {
+    return new NextResponse(text, {
+      status: resp.status,
+      headers: { "content-type": contentType || "text/plain" },
     });
-
-    // Reenvía status y cuerpo tal cual (forzando JSON en caso de texto)
-    const text = await upstream.text();
-    const isJSON = upstream.headers.get("content-type")?.includes("application/json");
-    return new Response(isJSON ? text : JSON.stringify({ data: text }), {
-      status: upstream.status,
-      headers: { "content-type": "application/json" },
-    });
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: `Upstream error: ${(err as Error).message}` }),
-      { status: 502, headers: { "content-type": "application/json" } }
-    );
   }
+
+  return new NextResponse(text, {
+    status: 200,
+    headers: { "content-type": contentType || "application/json" },
+  });
 }
-
