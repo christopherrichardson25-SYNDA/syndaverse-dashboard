@@ -1,38 +1,68 @@
-import { NextResponse } from "next/server";
+// app/api/chat/route.ts
+export const runtime = "nodejs"; // o "edge" si prefieres
 
-type ChatIn = { message?: string };
+type ChatRequest = { message?: string };
 
-function joinUrl(base: string, path: string) {
-  const b = base.replace(/\/+$/,"");
-  const p = path.replace(/^\/+/,"");
-  return `${b}/${p}`;
+const SYNDABRAIN_API_URL = process.env.SYNDABRAIN_API_URL;
+
+/** GET: pequeño healthcheck para que no 404 y puedas hacer `curl | jq` */
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      ok: true,
+      service: "syndaverse /api/chat",
+      backend: SYNDABRAIN_API_URL ? "configured" : "missing",
+    }),
+    { status: 200, headers: { "content-type": "application/json" } }
+  );
 }
 
+/** POST: proxyea al backend de SyndaBrain */
 export async function POST(req: Request) {
+  if (!SYNDABRAIN_API_URL) {
+    return new Response(
+      JSON.stringify({ error: "SYNDABRAIN_API_URL no está configurada" }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
+  }
+
+  let payload: ChatRequest;
   try {
-    const { message } = (await req.json()) as ChatIn;
-    if (!message || !message.trim()) {
-      return NextResponse.json({ error: "message is required" }, { status: 400 });
-    }
+    payload = (await req.json()) as ChatRequest;
+  } catch {
+    return new Response(
+      JSON.stringify({ error: "JSON inválido" }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
 
-    const backend = process.env.NEXT_PUBLIC_SYNDABRAIN_URL ?? "https://syndabrain.vercel.app";
-    const url = joinUrl(backend, "chat");
+  const message = (payload.message ?? "").trim();
+  if (!message) {
+    return new Response(
+      JSON.stringify({ error: "message requerido" }),
+      { status: 400, headers: { "content-type": "application/json" } }
+    );
+  }
 
-    const r = await fetch(url, {
+  try {
+    const upstream = await fetch(`${SYNDABRAIN_API_URL}/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ message }),
     });
 
-    const text = await r.text();
-    const ct = r.headers.get("content-type") ?? "text/plain; charset=utf-8";
-    return new NextResponse(text, { status: r.status, headers: { "content-type": ct } });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    // Reenvía status y cuerpo tal cual (forzando JSON en caso de texto)
+    const text = await upstream.text();
+    const isJSON = upstream.headers.get("content-type")?.includes("application/json");
+    return new Response(isJSON ? text : JSON.stringify({ data: text }), {
+      status: upstream.status,
+      headers: { "content-type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(
+      JSON.stringify({ error: `Upstream error: ${(err as Error).message}` }),
+      { status: 502, headers: { "content-type": "application/json" } }
+    );
   }
 }
 
-export async function GET() {
-  return NextResponse.json({ ok: true, message: "Syndabrain endpoint activo" });
-}
