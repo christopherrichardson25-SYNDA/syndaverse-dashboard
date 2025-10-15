@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const target = `${backend.replace(/\/$/, "")}/api/chat`;
+  const target = `${backend.replace(/\/$/, "")}/chat`;
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 30000); // 30s
