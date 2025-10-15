@@ -1,22 +1,15 @@
 // app/api/chat/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";       // no cache
-export const revalidate = 0;
+const backend = process.env.SYNDABRAIN_API_URL;
 
-const backend = process.env.SYNDABRAIN_API_URL?.replace(/\/$/, "") || "";
-
-// GET: health
+// Salud: GET
 export async function GET() {
   return NextResponse.json(
     {
       ok: true,
       service: "syndaverse /api/chat",
       backend: backend ? "configured" : "missing",
-      backend_url: backend || null,
-      backend_path_primary: "/api/chat",
-      backend_path_fallback: "/chat",
-      target_preview: backend ? `${backend}/api/chat` : null,
     },
     { headers: { "cache-control": "no-store" } }
   );
@@ -28,7 +21,7 @@ type ChatBody = {
   context?: Record<string, unknown>;
 };
 
-// POST: proxy con fallback /api/chat -> /chat
+// Proxy POST -> Syndabrain (/api/chat con fallback a /chat)
 export async function POST(req: NextRequest) {
   if (!backend) {
     return NextResponse.json(
@@ -47,52 +40,52 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const primary = `${backend}/api/chat`;
-  const fallback = `${backend}/chat`;
+  const base = backend.replace(/\/$/, "");
+  const primary = `${base}/api/chat`;
+  const fallback = `${base}/chat`;
 
-  async function hit(url: string) {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 30000);
-    try {
-      const resp = await fetch(url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
-        signal: ctrl.signal,
-        cache: "no-store",
-        next: { revalidate: 0 },
-      });
-      const text = await resp.text();
-      clearTimeout(t);
-      return { resp, text };
-    } catch (e: any) {
-      clearTimeout(t);
-      throw e;
-    }
-  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30_000);
+
+  const doFetch = async (url: string) =>
+    fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+      signal: ctrl.signal,
+      cache: "no-store",
+      next: { revalidate: 0 },
+    });
 
   try {
-    // 1) intenta /api/chat
-    let { resp, text } = await hit(primary);
+    let resp = await doFetch(primary);
+    if (resp.status === 404) resp = await doFetch(fallback);
+    clearTimeout(timer);
 
-    // 2) si 404, reintenta /chat
-    if (resp.status === 404) {
-      const r2 = await hit(fallback);
-      resp = r2.resp;
-      text = r2.text;
+    const text = await resp.text();
+    const contentType = resp.headers.get("content-type") ?? "application/json";
+
+    if (text) {
+      return new NextResponse(text, {
+        status: resp.status,
+        headers: { "content-type": contentType },
+      });
     }
 
-    const contentType = resp.headers.get("content-type") || "application/json";
-    if (text && text.length > 0) {
-      return new NextResponse(text, { status: resp.status, headers: { "content-type": contentType } });
-    }
     return NextResponse.json(
-      { ok: resp.ok, status: resp.status, upstream: "syndabrain", note: "Empty body from upstream" },
+      {
+        ok: resp.ok,
+        status: resp.status,
+        upstream: "syndabrain",
+        note: "Empty body from upstream",
+      },
       { status: resp.status }
     );
-  } catch (e: any) {
+  } catch (e: unknown) {
+    clearTimeout(timer);
+    const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json(
-      { ok: false, error: e?.message || String(e), upstream: "syndabrain" },
+      { ok: false, error: message, upstream: "syndabrain" },
       { status: 502 }
     );
   }
