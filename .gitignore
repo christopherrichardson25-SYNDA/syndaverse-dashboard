@@ -54,3 +54,4 @@ next-env.d.ts
 *.bak.*
 cookies.txt
 app/app.py
+.env.local
