@@ -1,14 +1,22 @@
+// app/api/chat/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const backend = process.env.SYNDABRAIN_API_URL!;
+export const dynamic = "force-dynamic";       // no cache
+export const revalidate = 0;
 
-// Salud: GET
+const backend = process.env.SYNDABRAIN_API_URL?.replace(/\/$/, "") || "";
+
+// GET: health
 export async function GET() {
   return NextResponse.json(
     {
       ok: true,
       service: "syndaverse /api/chat",
       backend: backend ? "configured" : "missing",
+      backend_url: backend || null,
+      backend_path_primary: "/api/chat",
+      backend_path_fallback: "/chat",
+      target_preview: backend ? `${backend}/api/chat` : null,
     },
     { headers: { "cache-control": "no-store" } }
   );
@@ -20,7 +28,7 @@ type ChatBody = {
   context?: Record<string, unknown>;
 };
 
-// Proxy POST -> Syndabrain
+// POST: proxy con fallback /api/chat -> /chat
 export async function POST(req: NextRequest) {
   if (!backend) {
     return NextResponse.json(
@@ -33,57 +41,58 @@ export async function POST(req: NextRequest) {
   try {
     body = (await req.json()) as ChatBody;
   } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Invalid JSON body" },
+      { status: 400 }
+    );
   }
 
-  const target = `${backend.replace(/\/$/, "")}/api/chat`;
-  try {
+  const primary = `${backend}/api/chat`;
+  const fallback = `${backend}/chat`;
+
+  async function hit(url: string) {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 30000); // 30s
-
-    const resp = await fetch(target, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-      signal: ctrl.signal,
-      // importante en Vercel/Next:
-      cache: "no-store",
-      next: { revalidate: 0 },
-    }).catch((e) => {
-      // Diferenciar abort/timeout
-      if (e.name === "AbortError") throw new Error("Upstream timeout");
-      throw e;
-    });
-    clearTimeout(timer);
-
-    const contentType = resp.headers.get("content-type") || "";
-
-    // Si viene cuerpo, pásalo tal cual:
-    const text = await resp.text();
-    if (text && text.length > 0) {
-      return new NextResponse(text, {
-        status: resp.status,
-        headers: { "content-type": contentType || "application/json" },
+    const t = setTimeout(() => ctrl.abort(), 30000);
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+        cache: "no-store",
+        next: { revalidate: 0 },
       });
+      const text = await resp.text();
+      clearTimeout(t);
+      return { resp, text };
+    } catch (e: any) {
+      clearTimeout(t);
+      throw e;
+    }
+  }
+
+  try {
+    // 1) intenta /api/chat
+    let { resp, text } = await hit(primary);
+
+    // 2) si 404, reintenta /chat
+    if (resp.status === 404) {
+      const r2 = await hit(fallback);
+      resp = r2.resp;
+      text = r2.text;
     }
 
-    // Si NO viene cuerpo, fabrica uno legible:
+    const contentType = resp.headers.get("content-type") || "application/json";
+    if (text && text.length > 0) {
+      return new NextResponse(text, { status: resp.status, headers: { "content-type": contentType } });
+    }
     return NextResponse.json(
-      {
-        ok: resp.ok,
-        status: resp.status,
-        upstream: "syndabrain",
-        note: "Empty body from upstream",
-      },
+      { ok: resp.ok, status: resp.status, upstream: "syndabrain", note: "Empty body from upstream" },
       { status: resp.status }
     );
-  } catch (e: unknown) {
+  } catch (e: any) {
     return NextResponse.json(
-      {
-        ok: false,
-        error: e instanceof Error ? e.message : String(e),
-        upstream: "syndabrain",
-      },
+      { ok: false, error: e?.message || String(e), upstream: "syndabrain" },
       { status: 502 }
     );
   }
