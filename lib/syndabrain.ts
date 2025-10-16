@@ -1,21 +1,28 @@
-export type BrainReply = {
+// lib/syndabrain.ts
+export type ChatContext = Record<string, unknown>;
+
+export type ChatResponse = {
   reply: string;
   model: string;
-  app?: string;
-  ethics?: any;
+  app?: string | null;
+  ethics?: Record<string, unknown> | null;
 };
 
-export async function askSynda(message: string, app = "SyndaTools", k = 5) {
-  const url = `${process.env.NEXT_PUBLIC_BRAIN_URL}/api/chat`;
-  const res = await fetch(url, {
+export async function sendChat(
+  message: string,
+  context: ChatContext = {}
+): Promise<ChatResponse> {
+  const res = await fetch("/api/chat", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ message, context: { app, k } }),
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ message, context }),
+    cache: "no-store",
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`SyndaBrain error ${res.status}: ${text}`);
+    const text = await res.text().catch(() => "");
+    throw new Error(`Upstream error ${res.status}: ${text || res.statusText}`);
   }
-  return (await res.json()) as BrainReply;
+
+  return (await res.json()) as ChatResponse;
 }
