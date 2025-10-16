@@ -1,4 +1,3 @@
-cat > components/Chat.tsx <<'TSX'
 "use client";
 
 import { useState, type ChangeEvent, type KeyboardEvent } from "react";
@@ -117,5 +116,3 @@ export default function Chat() {
     </div>
   );
 }
-TSX
-
