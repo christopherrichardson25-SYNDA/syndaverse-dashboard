@@ -1,7 +1,26 @@
 // app/api/chat/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const backend = process.env.SYNDABRAIN_API_URL;
+// ====== Resolución robusta de BACKEND ======
+function resolveBackendBase(): string | null {
+  const raw =
+    process.env.SYNDABRAIN_URL ||
+    process.env.NEXT_PUBLIC_BRAIN_API ||
+    process.env.SYNDABRAIN_API_URL ||
+    null;
+
+  if (!raw) return null;
+  try {
+    // Normaliza y valida la URL
+    const u = new URL(raw);
+    // quita trailing slash
+    return u.toString().replace(/\/+$/, "");
+  } catch {
+    return null;
+  }
+}
+
+const BACKEND_BASE = resolveBackendBase();
 
 // Salud: GET
 export async function GET() {
@@ -9,7 +28,8 @@ export async function GET() {
     {
       ok: true,
       service: "syndaverse /api/chat",
-      backend: backend ? "configured" : "missing",
+      backend: BACKEND_BASE ? "configured" : "missing_or_invalid",
+      resolved: BACKEND_BASE || null,
     },
     { headers: { "cache-control": "no-store" } }
   );
@@ -23,9 +43,13 @@ type ChatBody = {
 
 // Proxy POST -> Syndabrain (/api/chat con fallback a /chat)
 export async function POST(req: NextRequest) {
-  if (!backend) {
+  if (!BACKEND_BASE) {
     return NextResponse.json(
-      { ok: false, error: "SYNDABRAIN_API_URL not configured" },
+      {
+        ok: false,
+        error:
+          "SyndaBrain URL not configured. Set SYNDABRAIN_URL or NEXT_PUBLIC_BRAIN_API (or SYNDABRAIN_API_URL).",
+      },
       { status: 500 }
     );
   }
@@ -40,9 +64,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const base = backend.replace(/\/$/, "");
-  const primary = `${base}/api/chat`;
-  const fallback = `${base}/chat`;
+  const primary = `${BACKEND_BASE}/api/chat`;
+  const fallback = `${BACKEND_BASE}/chat`;
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 30_000);
@@ -50,7 +73,11 @@ export async function POST(req: NextRequest) {
   const doFetch = async (url: string) =>
     fetch(url, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        // Puedes pasar señales útiles al backend:
+        "x-synda-source": "dashboard/api/chat",
+      },
       body: JSON.stringify(body),
       signal: ctrl.signal,
       cache: "no-store",
@@ -59,19 +86,25 @@ export async function POST(req: NextRequest) {
 
   try {
     let resp = await doFetch(primary);
-    if (resp.status === 404) resp = await doFetch(fallback);
+    if (resp.status === 404) {
+      // Compatibilidad con antiguos backends
+      resp = await doFetch(fallback);
+    }
     clearTimeout(timer);
 
+    // Pasamos el body tal cual venga (json o texto)
     const text = await resp.text();
     const contentType = resp.headers.get("content-type") ?? "application/json";
 
-    if (text) {
+    // Devolver el cuerpo del upstream (si lo hay) con el mismo status
+    if (text && text.length > 0) {
       return new NextResponse(text, {
         status: resp.status,
-        headers: { "content-type": contentType },
+        headers: { "content-type": contentType, "cache-control": "no-store" },
       });
     }
 
+    // Upstream sin cuerpo; devolvemos un JSON informativo
     return NextResponse.json(
       {
         ok: resp.ok,
@@ -79,7 +112,7 @@ export async function POST(req: NextRequest) {
         upstream: "syndabrain",
         note: "Empty body from upstream",
       },
-      { status: resp.status }
+      { status: resp.status, headers: { "cache-control": "no-store" } }
     );
   } catch (e: unknown) {
     clearTimeout(timer);
@@ -90,3 +123,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
