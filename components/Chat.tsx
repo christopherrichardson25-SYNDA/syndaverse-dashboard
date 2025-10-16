@@ -1,6 +1,7 @@
+cat > components/Chat.tsx <<'TSX'
 "use client";
 
-import { useState, ChangeEvent, KeyboardEvent } from "react";
+import { useState, type ChangeEvent, type KeyboardEvent } from "react";
 
 type Role = "user" | "assistant";
 
@@ -60,7 +61,7 @@ export default function Chat() {
       }
 
       const data = (await res.json()) as ChatResponse;
-      const reply = data.reply || "Sin respuesta";
+      const reply: string = data.reply || "Sin respuesta";
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -116,3 +117,5 @@ export default function Chat() {
     </div>
   );
 }
+TSX
+
