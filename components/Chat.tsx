@@ -1,48 +1,62 @@
+// components/Chat.tsx
 "use client";
+
 import { useState } from "react";
-import { askSynda } from "@/lib/syndabrain";
+import { sendChat, type ChatResponse } from "@/lib/syndabrain";
+
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
 
 export default function Chat() {
-  const [input, setInput] = useState("");
-  const [msgs, setMsgs] = useState<{role:"user"|"assistant", content:string}[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState<string>("");
 
-  const send = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!input.trim()) return;
-    const userMsg = input.trim();
-    setMsgs(m => [...m, { role: "user", content: userMsg }]);
+  const onSend = async () => {
+    const text = input.trim();
+    if (!text) return;
+
+    setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
-    setLoading(true);
+
     try {
-      const res = await askSynda(userMsg, "SyndaTools", 5);
-      setMsgs(m => [...m, { role: "assistant", content: res.reply }]);
-    } catch (err:any) {
-      setMsgs(m => [...m, { role: "assistant", content: `Error: ${err.message}` }]);
-    } finally {
-      setLoading(false);
+      const resp: ChatResponse = await sendChat(text, { app: "core" });
+      setMessages((m) => [...m, { role: "assistant", content: resp.reply }]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: `Error: ${msg}` },
+      ]);
     }
   };
 
   return (
-    <div className="flex flex-col gap-3 max-w-2xl mx-auto">
-      <div className="border rounded p-3 h-80 overflow-auto bg-white">
-        {msgs.map((m,i) => (
-          <div key={i} className={m.role==="user" ? "text-right" : ""}>
-            <pre className="whitespace-pre-wrap">{m.content}</pre>
+    <div style={{ border: "1px solid #eee", borderRadius: 8, padding: 16 }}>
+      <div style={{ display: "grid", gap: 8, marginBottom: 12 }}>
+        {messages.map((m, idx) => (
+          <div key={idx}>
+            <b>{m.role === "user" ? "Tú" : "SyndaBrain"}:</b> {m.content}
           </div>
         ))}
-        {loading && <div className="opacity-60">pensando…</div>}
       </div>
-      <form onSubmit={send} className="flex gap-2">
+
+      <div style={{ display: "flex", gap: 8 }}>
         <input
-          className="flex-1 border rounded p-2"
           value={input}
-          onChange={e=>setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSend();
+            }
+          }}
           placeholder="Escribe tu mensaje…"
+          style={{ flex: 1, padding: 8 }}
         />
-        <button className="border rounded px-3" type="submit">Enviar</button>
-      </form>
+        <button onClick={onSend}>Enviar</button>
+      </div>
     </div>
   );
 }
