@@ -12,7 +12,7 @@ const REPOS = {
   onboardingEnterprise: `${GH}/onboarding-enterprises`,
   onboardingAgents: `${GH}/onboarding-agents`,
   syndapsis: `${GH}/syndapsis-platform`,
-  syndatools: `${GH}/syndatools`,
+  syndatools: "https://syndatools.vercel.app/",
   syndapticCalculator: `${GH}/syndaptic-calculator`,
 };
 
