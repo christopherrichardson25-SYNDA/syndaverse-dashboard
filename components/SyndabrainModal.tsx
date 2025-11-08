@@ -41,7 +41,9 @@ export default function SyndabrainModal({
     ([k, v]) => [k, v == null ? "" : String(v)]
   );
 
-  const base = "/syndabrain/widget";
+  const base =
+  process.env.NEXT_PUBLIC_SYNDABRAIN_URL ??
+  "https://tru-e-synda-brain.onrender.com/syndabrain/widget";
   const qs = new URLSearchParams({
     uid: userId ?? "",
     email: userEmail ?? "",
