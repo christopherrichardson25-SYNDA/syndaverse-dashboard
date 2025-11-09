@@ -36,38 +36,55 @@ export default function SyndabrainModal({
     return () => d.removeEventListener("cancel", onCancel);
   }, [onClose]);
 
-  // Normaliza pageContext -> string para URLSearchParams
+  // Normaliza pageContext -> string
   const normalizedEntries: [string, string][] = Object.entries(pageContext).map(
     ([k, v]) => [k, v == null ? "" : String(v)]
   );
 
-  const base =
-  process.env.NEXT_PUBLIC_SYNDABRAIN_URL ??
-  "https://tru-e-synda-brain.onrender.com/syndabrain/widget";
   const qs = new URLSearchParams({
     uid: userId ?? "",
     email: userEmail ?? "",
+    // idioma del navegador
     lang: typeof window !== "undefined" ? (navigator.language || "en") : "en",
     ...Object.fromEntries(normalizedEntries),
   }).toString();
 
-  const src = `${base}?${qs}`;
+  // 👇 BASE del backend (primero variable de entorno, si no, tu URL de Render)
+  const base =
+    (process.env.NEXT_PUBLIC_SYNDA_BRAIN_URL as string | undefined)
+    ?? "https://tru-e-synda-brain.onrender.com";
+
+  const src = `${base.replace(/\/+$/, "")}/syndabrain/widget?${qs}`;
 
   const onBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const d = dialogRef.current!;
     const r = d.getBoundingClientRect();
-    const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    const inside =
+      e.clientX >= r.left &&
+      e.clientX <= r.right &&
+      e.clientY >= r.top &&
+      e.clientY <= r.bottom;
     if (!inside) onClose();
   };
 
   return (
-    <dialog ref={dialogRef} className="s-modal" onMouseDown={onBackdropClick} aria-labelledby="syndabrain-title">
+    <dialog
+      ref={dialogRef}
+      className="s-modal"
+      onMouseDown={onBackdropClick}
+      aria-labelledby="syndabrain-title"
+    >
       <div className="s-card">
         <header className="s-header">
           <h2 id="syndabrain-title" className="s-title">SYNDA Chat</h2>
           <button className="s-close" onClick={onClose} aria-label="Close">✕</button>
         </header>
-        <iframe src={src} title="Syndabrain" className="s-iframe" allow="clipboard-write; microphone; camera" />
+        <iframe
+          src={src}
+          title="Syndabrain"
+          className="s-iframe"
+          allow="clipboard-write; microphone; camera"
+        />
       </div>
 
       <style jsx>{`
